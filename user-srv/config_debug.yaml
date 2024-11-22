@@ -1,0 +1,18 @@
+host: "192.168.2.108"
+port: 8080
+name: "user-srv"
+
+mysql:
+  host: "192.168.2.108"
+  port: 23306
+  dbName: "mxshop"
+  username: "root"
+  password: "123456"
+
+consul:
+  host: "192.168.2.108"
+  port: 8500
+  name: "user-srv"
+  tag:
+    - "srv"
+    - "go"

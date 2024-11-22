@@ -1,0 +1,23 @@
+services:
+  consul:
+    image: consul:1.15.4
+    container_name: consul
+    ports:
+      - "8500:8500"    # Consul HTTP API
+      - "8300:8300"    # Consul RPC
+      - "8301:8301"    # Consul LAN communication
+      - "8302:8302"    # Consul WAN communication
+      - "8600:8600/udp" # DNS for Consul (UDP)
+    volumes:
+      - consul_data:/consul/data  # 持久化存储
+    command: "consul agent -dev -client=0.0.0.0"  # 启动 Consul 开发模式
+    restart: always
+    networks:
+      - consul_network
+
+volumes:
+  consul_data:  # 持久化存储卷
+
+networks:
+  consul_network:
+    driver: bridge  # 使用默认的桥接网络模式
