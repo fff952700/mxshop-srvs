@@ -2,19 +2,21 @@ package main
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	"google.golang.org/grpc/health/grpc_health_v1"
-	"mxshop-srvs/user-srv/global"
-	"mxshop-srvs/user-srv/handler"
-	"mxshop-srvs/user-srv/initialize"
-	"mxshop-srvs/user-srv/proto"
-	"mxshop-srvs/user-srv/utils"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+
+	"mxshop_srvs/user_srv/global"
+	"mxshop_srvs/user_srv/handler"
+	"mxshop_srvs/user_srv/initialize"
+	"mxshop_srvs/user_srv/proto"
+	"mxshop_srvs/user_srv/utils"
 )
 
 func main() {

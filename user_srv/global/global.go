@@ -1,9 +1,11 @@
 package global
 
 import (
-	"github.com/hashicorp/consul/api"
 	"gorm.io/gorm"
-	"mxshop-srvs/user-srv/config"
+
+	"github.com/hashicorp/consul/api"
+
+	"mxshop_srvs/user_srv/config"
 )
 
 var (

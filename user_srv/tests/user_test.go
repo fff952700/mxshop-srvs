@@ -4,6 +4,12 @@ import (
 	"context"
 	"crypto/sha512"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/anaskhan96/go-password-encoder"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -11,14 +17,9 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"log"
-	"os"
-	"strings"
-	"testing"
-	"time"
 
-	"mxshop-srvs/user-srv/model"
-	"mxshop-srvs/user-srv/proto"
+	"mxshop_srvs/user_srv/model"
+	"mxshop_srvs/user_srv/proto"
 )
 
 var (

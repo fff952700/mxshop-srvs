@@ -2,11 +2,13 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/hashicorp/consul/api"
-	"go.uber.org/zap"
-	"mxshop-srvs/user-srv/global"
 	"strconv"
 	"time"
+
+	"github.com/hashicorp/consul/api"
+	"go.uber.org/zap"
+
+	"mxshop_srvs/user_srv/global"
 )
 
 // InitConsul 创建Consul客户端

@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"log"
-	"mxshop-srvs/user-srv/model"
+	"mxshop_srvs/user_srv/model"
 	"os"
 	"time"
 )

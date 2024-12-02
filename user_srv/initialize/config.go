@@ -2,17 +2,19 @@ package initialize
 
 import (
 	"fmt"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"mxshop-srvs/user-srv/global"
+
+	"mxshop_srvs/user_srv/global"
 )
 
 func InitConfig() {
 	debug := GetEnvInfo("MXSHOP_DEBUG")
 	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("user-srv/%s_pro.yaml", configFilePrefix)
+	configFileName := fmt.Sprintf("user_srv/%s_pro.yaml", configFilePrefix)
 	if debug {
-		configFileName = fmt.Sprintf("user-srv/%s_debug.yaml", configFilePrefix)
+		configFileName = fmt.Sprintf("user_srv/%s_debug.yaml", configFilePrefix)
 	}
 	v := viper.New()
 	// 设置文件路径

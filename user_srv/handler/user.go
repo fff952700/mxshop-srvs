@@ -14,9 +14,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 
-	"mxshop-srvs/user-srv/global"
-	"mxshop-srvs/user-srv/model"
-	"mxshop-srvs/user-srv/proto"
+	"mxshop_srvs/user_srv/global"
+	"mxshop_srvs/user_srv/model"
+	"mxshop_srvs/user_srv/proto"
 )
 
 type UserServer struct{}
