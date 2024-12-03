@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"mxshop_srvs/goods_srv/mode"
+	"mxshop_srvs/goods_srv/model"
 )
 
 func main() {
@@ -34,5 +34,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	_ = db.AutoMigrate(&mode.Category{}, &mode.Brands{}, &mode.GoodsCategoryBrand{}, &mode.Banner{}, &mode.Goods{})
+	_ = db.AutoMigrate(&model.Category{}, &model.Brands{}, &model.GoodsCategoryBrand{}, &model.Banner{}, &model.Goods{})
 }

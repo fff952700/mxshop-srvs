@@ -1,4 +1,4 @@
-package mode
+package model
 
 // Category 商品分类表
 type Category struct {
