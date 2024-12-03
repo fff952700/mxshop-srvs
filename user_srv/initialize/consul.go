@@ -29,9 +29,9 @@ func InitConsul() {
 func registerService() {
 	// 健康检查
 	check := &api.AgentServiceCheck{
-		GRPC:     fmt.Sprintf("%s:%d", global.ServerConf.Host, global.ServerConf.Port), //
-		Timeout:  "5s",                                                                 // 超时时间
-		Interval: "5s",                                                                 // 运行检查的频率
+		GRPC:     fmt.Sprintf("%s:%d", global.ServerConf.ServerInfo.Host, global.ServerConf.ServerInfo.Port), //
+		Timeout:  "5s",                                                                                       // 超时时间
+		Interval: "5s",                                                                                       // 运行检查的频率
 		// 指定时间后自动注销不健康的服务节点
 		DeregisterCriticalServiceAfter: "15s",
 	}
@@ -41,8 +41,8 @@ func registerService() {
 		ID:      global.ServerConf.ConsulInfo.Id,   // 服务唯一ID
 		Name:    global.ServerConf.ConsulInfo.Name, // 服务名称
 		Tags:    global.ServerConf.ConsulInfo.Tag,  // 为服务打标签
-		Address: global.ServerConf.Host,
-		Port:    global.ServerConf.Port,
+		Address: global.ServerConf.ServerInfo.Host,
+		Port:    global.ServerConf.ServerInfo.Port,
 		Check:   check,
 	}
 	err := global.Consul.Agent().ServiceRegister(registration)

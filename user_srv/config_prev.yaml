@@ -1,10 +1,9 @@
-nacos:
-  host: "192.168.2.106"
-  port: 8848
-  scheme: "http"
-  namespace: "09d89590-bb9a-4218-8b67-db9ac8364bba"
-  dataId: "user-srv"
-  group: "dev"
+host: "192.168.2.106"
+port: 8848
+scheme: "http"
+namespace: "09d89590-bb9a-4218-8b67-db9ac8364bba"
+dataId: "user-srv"
+group: "dev"
 
 #server:
 #  host: "192.168.2.106"

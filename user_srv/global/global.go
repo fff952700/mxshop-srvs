@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	ServerConf *config.ServerCfg = &config.ServerCfg{}
+	ServerConf = &config.ServerCfg{}
+	NacosConf  = &config.NacosConfig{}
 	DB         *gorm.DB
 	Consul     *api.Client
 )

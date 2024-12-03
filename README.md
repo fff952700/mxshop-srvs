@@ -4,7 +4,7 @@
 go get github.com/anaskhan96/go-password-encoder
 
 2、将srv服务注册到consul中,ip地址不能写localhost或127.0.0.1  
-
+3、添加配置中间nacos  
 
 ### protoc 使用
 protoc
