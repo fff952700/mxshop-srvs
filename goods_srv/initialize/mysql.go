@@ -11,11 +11,16 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"mxshop_srvs/user_srv/global"
+	"mxshop_srvs/goods_srv/global"
 )
 
 func InitMysql() {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", global.ServerConf.MysqlInfo.Username, global.ServerConf.MysqlInfo.Password, global.ServerConf.MysqlInfo.Host, global.ServerConf.MysqlInfo.Port, global.ServerConf.MysqlInfo.Dbname)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		global.ServerConf.MysqlInfo.Username,
+		global.ServerConf.MysqlInfo.Password,
+		global.ServerConf.MysqlInfo.Host,
+		global.ServerConf.MysqlInfo.Port,
+		global.ServerConf.MysqlInfo.Dbname)
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{

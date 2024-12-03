@@ -12,11 +12,11 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	"mxshop_srvs/user_srv/global"
-	"mxshop_srvs/user_srv/handler"
-	"mxshop_srvs/user_srv/initialize"
-	"mxshop_srvs/user_srv/proto"
-	"mxshop_srvs/user_srv/utils"
+	"mxshop_srvs/goods_srv/global"
+	"mxshop_srvs/goods_srv/handler"
+	"mxshop_srvs/goods_srv/initialize"
+	"mxshop_srvs/goods_srv/proto"
+	"mxshop_srvs/goods_srv/utils"
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 	// 4、grpc注册
 	server := grpc.NewServer()
 
-	proto.RegisterUserServer(server, &handler.UserServer{})
+	proto.RegisterGoodsServer(server, &handler.GoodsServer{})
 	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", svc.Host, svc.Port))
 	if err != nil {
 		panic(err)
