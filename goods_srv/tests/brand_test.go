@@ -41,7 +41,7 @@ func InitMysql() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		"root",
 		"123456",
-		"192.168.2.106",
+		"192.168.2.103",
 		23306,
 		"mxshop_goods")
 	newLogger := logger.New(
