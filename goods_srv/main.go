@@ -29,7 +29,7 @@ func main() {
 	svc := global.ServerConf.ServerInfo
 	// 4.随机port测试lb
 	debug := initialize.GetEnvInfo("MXSHOP_DEBUG")
-	if debug {
+	if !debug {
 		// 使用随机可用端口
 		port, err := utils.GetFreePort()
 		zap.S().Infof("random port:%d", port)

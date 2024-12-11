@@ -2,13 +2,13 @@ package model
 
 // Category 商品分类表
 type Category struct {
-	BaseModel
-	Name             string `gorm:"type:varchar(255);"`
-	ParentCategoryId int32  `gorm:"type:int; not null"`
-	ParentCategory   *Category
-	SubCategory      []*Category `gorm:"foreignKey:ParentCategoryId;references:Id"` // 通过 ParentCategoryId 关联到其他 Category 记录的 Id 字段
-	Level            int32       `gorm:"type:tinyint; not null;comment '分类等级'"`
-	IsTab            bool        `gorm:"type:tinyint; not null;comment '是否显示'"`
+	BaseModel        `json:"base_model"`
+	Name             string      `gorm:"type:varchar(255);" json:"name"`
+	ParentCategoryId int32       `gorm:"type:int; not null" json:"parent_category_id"`
+	ParentCategory   *Category   `json:"-"`
+	SubCategory      []*Category `gorm:"foreignKey:ParentCategoryId;references:Id" json:"sub_category"` // 通过 ParentCategoryId 关联到其他 Category 记录的 Id 字段
+	Level            int32       `gorm:"type:tinyint; not null;comment '分类等级'" json:"level"`
+	IsTab            bool        `gorm:"type:tinyint; not null;comment '是否显示'" json:"is_tab"`
 }
 
 // Brands 品牌表
