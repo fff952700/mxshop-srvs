@@ -29,10 +29,11 @@ func (g *GoodsServer) GetAllCategoryList(context.Context, *emptypb.Empty) (*prot
 
 func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryListRequest) (*proto.SubCategoryListResponse, error) {
 	// 判断分类是否存在
-	var category model.Category
-	if result := global.DB.Where(model.Category{Level: req.Level}).First(&category); result.Error != nil {
-		return nil, status.Errorf(codes.NotFound, "category not found")
+	category := &model.Category{}
+	if result := global.DB.First(category, req.Id); result.Error != nil && result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "subCategory not found")
 	}
+
 	// 实例化返回对象处理1级分类
 	categoryListResponse := &proto.SubCategoryListResponse{}
 	categoryListResponse.Info = &proto.CategoryInfoResponse{
@@ -42,8 +43,6 @@ func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 		ParentCategory: category.ParentCategoryId,
 		IsTab:          category.IsTab,
 	}
-	// 1及分类对象
-	zap.S().Infof("top category %v", category)
 	// 处理子类
 	var SubCategoryList []model.Category
 	var SubCateGoryResponseList []*proto.CategoryInfoResponse
@@ -51,7 +50,8 @@ func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 	if req.Level == 1 {
 		Preload = "SubCategory.SubCategory"
 	}
-	global.DB.Where(model.Category{Level: 1}).Preload(Preload).Find(&SubCategoryList)
+	global.DB.Where(&model.Category{Level: 1}).Preload(Preload).Find(&SubCategoryList)
+
 	for _, SubCategory := range SubCategoryList {
 		SubCateGoryResponseList = append(SubCateGoryResponseList, &proto.CategoryInfoResponse{
 			Id:             SubCategory.Id,
@@ -61,7 +61,53 @@ func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 			IsTab:          SubCategory.IsTab,
 		})
 	}
-	zap.S().Infof("two category %v", SubCateGoryResponseList)
 	categoryListResponse.SubCategory = SubCateGoryResponseList
 	return categoryListResponse, nil
+}
+
+func (g *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
+	category := &model.Category{}
+	if result := global.DB.First(category, req.Id); result.RowsAffected == 1 {
+		return nil, status.Errorf(codes.NotFound, "category is already exists")
+	}
+	// 判断是否为1级分类
+	if req.Level != 1 {
+		category.ParentCategoryId = req.ParentCategory
+	}
+	category.Id = req.Id
+	category.Name = req.Name
+	category.Level = req.Level
+	category.Url = req.Url
+	category.IsTab = req.IsTab
+	global.DB.Create(&category)
+	return &proto.CategoryInfoResponse{Id: category.Id}, nil
+}
+
+func (g *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*emptypb.Empty, error) {
+	if result := global.DB.Delete(&model.Category{}, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "category not found")
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (g *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*emptypb.Empty, error) {
+	category := &model.Category{}
+	if result := global.DB.First(category, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "category not found")
+	}
+	// 对值进行修改
+	if req.Name != "" {
+		category.Name = req.Name
+	}
+	if req.Level != 1 {
+		category.Level = req.Level
+	}
+	if req.ParentCategory != 0 {
+		category.ParentCategoryId = req.ParentCategory
+	}
+	if req.IsTab {
+		category.IsTab = req.IsTab
+	}
+	global.DB.Save(&category)
+	return &emptypb.Empty{}, nil
 }

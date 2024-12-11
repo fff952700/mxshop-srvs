@@ -10,7 +10,7 @@ type BaseModel struct {
 	Id        int32     `gorm:"primary_key;AUTO_INCREMENT" json:"id"`
 	CreatedAt time.Time `gorm:"type:datetime;DEFAULT:CURRENT_TIMESTAMP" json:"-"`
 	UpdatedAt time.Time `gorm:"type:datetime;DEFAULT:CURRENT_TIMESTAMP" json:"-"`
-	IsDel     bool      `gorm:"type:tinyint(1);DEFAULT:1;comment:'false 1 (not deleted), true 2 (deleted)'" json:"-"`
+	IsDel     bool      `gorm:"type:tinyint(1);DEFAULT:0;comment:'false 0 (not deleted), true 1 (deleted)'" json:"-"`
 }
 
 type GormList []string

@@ -52,6 +52,7 @@ message CategoryInfoRequest {
   int32 parentCategory = 3;
   int32 level = 4;
   bool isTab = 5;
+  string url = 6;
 }
 
 message DeleteCategoryRequest {

@@ -4,11 +4,12 @@ package model
 type Category struct {
 	BaseModel        `json:"base_model"`
 	Name             string      `gorm:"type:varchar(255);" json:"name"`
-	ParentCategoryId int32       `gorm:"type:int; not null" json:"parent_category_id"`
+	ParentCategoryId int32       `gorm:"type:int;DEFAULT 0;" json:"parent_category_id"`
 	ParentCategory   *Category   `json:"-"`
 	SubCategory      []*Category `gorm:"foreignKey:ParentCategoryId;references:Id" json:"sub_category"` // 通过 ParentCategoryId 关联到其他 Category 记录的 Id 字段
 	Level            int32       `gorm:"type:tinyint; not null;comment '分类等级'" json:"level"`
 	IsTab            bool        `gorm:"type:tinyint; not null;comment '是否显示'" json:"is_tab"`
+	Url              string      `gorm:"type:varchar(255);" json:"url"`
 }
 
 // Brands 品牌表
