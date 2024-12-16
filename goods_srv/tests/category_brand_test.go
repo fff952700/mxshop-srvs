@@ -41,3 +41,15 @@ func TestCreateCategoryBrand(t *testing.T) {
 	}
 	zap.S().Info(rsp)
 }
+
+func TestDeleteCategoryBrand(t *testing.T) {
+	InitClient()
+	rsp, err := GoodsClient.DeleteCategoryBrand(context.Background(), &proto.CategoryBrandRequest{
+		CategoryId: 130366,
+		BrandId:    646,
+	})
+	if err != nil {
+		zap.S().Error(err)
+	}
+	zap.S().Info(rsp)
+}

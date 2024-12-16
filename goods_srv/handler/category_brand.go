@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -124,9 +125,25 @@ func (g *GoodsServer) CreateCategoryBrand(ctx context.Context, req *proto.Catego
 	return &proto.CategoryBrandResponse{Id: categoryBrand.Id}, nil
 }
 
-//func (g *GoodsServer) DeleteCategoryBrand(context.Context, *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
-//
-//}
-//func (g *GoodsServer) UpdateCategoryBrand(context.Context, *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
-//
-//}
+func (g *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
+	var (
+		categoryBrand = model.GoodsCategoryBrand{}
+	)
+	if result := global.DB.Where("category_id = ? and brand_id = ?", req.CategoryId, req.BrandId).Delete(&categoryBrand); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "categoryBrand not found")
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (g *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
+	var (
+		categoryBrand = model.GoodsCategoryBrand{
+			CategoryId: req.CategoryId,
+			BrandId:    req.BrandId,
+		}
+	)
+	if result := global.DB.Where("id = ?", req.Id).Save(&categoryBrand); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "categoryBrand not found")
+	}
+	return &emptypb.Empty{}, nil
+}
