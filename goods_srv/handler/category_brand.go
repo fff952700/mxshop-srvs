@@ -74,35 +74,22 @@ func (g *GoodsServer) CategoryBrandList(ctx context.Context, req *proto.Category
 func (s *GoodsServer) GetCategoryBrandList(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.BrandListResponse, error) {
 	var (
 		brandListResponse = &proto.BrandListResponse{}
-		categoryBrandList []model.GoodsCategoryBrand
-		brandIds          []int32
-		brands            []model.Brands
-		brandMap          = make(map[int32]model.Brands)
+		brandsList        []model.Brands
 		brandInfoResponse []*proto.BrandInfoResponse
 	)
-	// 查看分类是否存在
-	result := global.DB.Where("category_id = ?", req.Id).Find(&categoryBrandList)
+	subQuery := global.DB.Table("goods_category_brand").Select("brand_id").Where("category_id= ?", req.Id)
+	result := global.DB.Where("id in (?)", subQuery).Find(&brandsList)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "category not found")
 	}
 	brandListResponse.Total = int32(result.RowsAffected)
-	// 获取所有brandId
-	for _, cb := range categoryBrandList {
-		brandIds = append(brandIds, cb.BrandId)
-	}
-	global.DB.Where("id in ?", brandIds).Find(&brands)
-	for _, brand := range brands {
-		brandMap[brand.Id] = brand
-	}
-	// 构造返回数据
-	for _, cb := range categoryBrandList {
-		if brand, ok := brandMap[cb.BrandId]; ok {
-			brandInfoResponse = append(brandInfoResponse, &proto.BrandInfoResponse{
-				Id:   brand.Id,
-				Name: brand.Name,
-				Logo: brand.Logo,
-			})
-		}
+	for _, brand := range brandsList {
+		brandInfoResponse = append(brandInfoResponse, &proto.BrandInfoResponse{
+			Id:   brand.Id,
+			Name: brand.Name,
+			Logo: brand.Logo,
+		})
+
 	}
 	brandListResponse.Data = brandInfoResponse
 	return brandListResponse, nil
