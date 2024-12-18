@@ -11,7 +11,7 @@
  Target Server Version : 80403 (8.4.3)
  File Encoding         : 65001
 
- Date: 16/12/2024 14:14:09
+ Date: 18/12/2024 16:11:33
 */
 
 SET NAMES utf8mb4;
@@ -590,7 +590,7 @@ CREATE TABLE `goods`  (
   `goods_brief` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `ship_free` tinyint(1) NOT NULL,
   `images` json NOT NULL,
-  `desc_images` varchar(4000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `desc_images` json NOT NULL,
   `goods_front_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `is_new` tinyint(1) NOT NULL,
   `is_hot` tinyint(1) NOT NULL,

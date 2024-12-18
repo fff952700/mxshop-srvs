@@ -51,6 +51,6 @@ type Goods struct {
 	ShopPrice       float32  `gorm:"not null;comment '实际价格'"`
 	GoodsBrief      string   `gorm:"type:varchar(255);not null;comment '商品介绍'"`
 	GoodsFrontImage string   `gorm:"type:varchar(255);not null;comment '商品缩略图'"`
-	Images          GormList `gorm:"type:varchar(4000);not null;comment '商品图片'"`
-	DescImages      GormList `gorm:"type:varchar(4000);not null;comment '商品详情图片'"`
+	Images          GormList `gorm:"type:json;not null;comment '商品图片'"`
+	DescImages      GormList `gorm:"type:json;not null;comment '商品详情图片'"`
 }
