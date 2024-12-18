@@ -14,7 +14,7 @@ import (
 )
 
 // InitConfig 通过先通过viper获取本地nacos配置在获取服务配置
-func InitConfig() {
+func init() {
 	v := viper.New()
 	debug := GetEnvInfo("MXSHOP_DEBUG")
 	configFilePrefix := "config"

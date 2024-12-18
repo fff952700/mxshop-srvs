@@ -8,7 +8,8 @@
 3、添加配置中间nacos  
 4、添加goods srv sql  
 5、删除外键影响效率和重写category_brand实现  
-6、goods_category_brand添加唯一索引category在前  
+6、goods_category_brand添加唯一索引category在前
+7、去掉手动初始化改为自动初始化
 
 ### protoc 使用
 

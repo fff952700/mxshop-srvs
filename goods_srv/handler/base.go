@@ -1,6 +1,13 @@
 package handler
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"mxshop_srvs/goods_srv/proto"
+)
+
+type GoodsServer struct {
+	proto.UnimplementedGoodsServer
+}
 
 func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {

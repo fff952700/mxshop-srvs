@@ -241,8 +241,6 @@ message GoodsInfoResponse {
   bool isHot = 18;
   bool onSale = 19;
   int64 addTime = 20;
-  CategoryBriefInfoResponse category = 21;
-  BrandInfoResponse brand = 22;
 }
 
 message GoodsListResponse {

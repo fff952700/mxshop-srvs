@@ -32,6 +32,7 @@ func (g *GoodsServer) GetAllCategoryList(context.Context, *emptypb.Empty) (*prot
 func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryListRequest) (*proto.SubCategoryListResponse, error) {
 	// 判断分类是否存在
 	category := &model.Category{}
+
 	if result := global.DB.First(category, req.Id); result.Error != nil && result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "subCategory not found")
 	}

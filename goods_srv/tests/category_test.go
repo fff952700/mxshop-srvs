@@ -11,7 +11,6 @@ import (
 )
 
 func TestGetCateGoryAll(t *testing.T) {
-	InitClient()
 	rsp, err := GoodsClient.GetAllCategoryList(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		zap.S().Error(err)
@@ -20,7 +19,6 @@ func TestGetCateGoryAll(t *testing.T) {
 }
 
 func TestGetSubCategory(t *testing.T) {
-	InitClient()
 	rsp, err := GoodsClient.GetSubCategory(context.Background(), &proto.CategoryListRequest{
 		Id:    130361,
 		Level: 1,
@@ -32,7 +30,6 @@ func TestGetSubCategory(t *testing.T) {
 }
 
 func TestCreateCategory(t *testing.T) {
-	InitClient()
 	categoryInfo := &proto.CategoryInfoRequest{
 		Id:    238013,
 		Name:  "testCategory",

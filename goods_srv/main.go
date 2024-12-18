@@ -21,11 +21,11 @@ import (
 
 func main() {
 	// 1、初始化zap
-	initialize.InitLogger()
-	// 2.获取配置
-	initialize.InitConfig()
+	//initialize.InitLogger()
+	//// 2.获取配置
+	//initialize.InitConfig()
 	// 3、mysql初始化
-	initialize.InitMysql()
+	//initialize.InitMysql()
 	svc := global.ServerConf.ServerInfo
 	// 4.随机port测试lb
 	debug := initialize.GetEnvInfo("MXSHOP_DEBUG")
@@ -52,7 +52,7 @@ func main() {
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
 	// 6、注册consul
-	initialize.InitConsul()
+	//initialize.InitConsul()
 
 	// 7、 服务发现
 	go func() {

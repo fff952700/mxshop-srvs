@@ -8,7 +8,6 @@ import (
 )
 
 func TestCategoryBrandList(t *testing.T) {
-	InitClient()
 	rsp, err := GoodsClient.CategoryBrandList(context.Background(), &proto.CategoryBrandFilterRequest{
 		Pages:       1,
 		PagePerNums: 10,
@@ -20,7 +19,6 @@ func TestCategoryBrandList(t *testing.T) {
 }
 
 func TestGetCategoryBrandList(t *testing.T) {
-	InitClient()
 	rsp, err := GoodsClient.GetCategoryBrandList(context.Background(), &proto.CategoryInfoRequest{
 		Id: 130366,
 	})
@@ -31,7 +29,6 @@ func TestGetCategoryBrandList(t *testing.T) {
 }
 
 func TestCreateCategoryBrand(t *testing.T) {
-	InitClient()
 	rsp, err := GoodsClient.CreateCategoryBrand(context.Background(), &proto.CategoryBrandRequest{
 		CategoryId: 130366,
 		BrandId:    646,
@@ -43,7 +40,6 @@ func TestCreateCategoryBrand(t *testing.T) {
 }
 
 func TestDeleteCategoryBrand(t *testing.T) {
-	InitClient()
 	rsp, err := GoodsClient.DeleteCategoryBrand(context.Background(), &proto.CategoryBrandRequest{
 		CategoryId: 130366,
 		BrandId:    646,
