@@ -5,11 +5,12 @@
 > go get github.com/anaskhan96/go-password-encoder
 
 2、将srv服务注册到consul中,ip地址不能写localhost或127.0.0.1  
-3、添加配置中间nacos  
+3、添加配置中间nacos
 4、添加goods srv sql  
 5、删除外键影响效率和重写category_brand实现  
 6、goods_category_brand添加唯一索引category在前
-7、去掉手动初始化改为自动初始化
+7、去掉手动初始化改为自动初始化  
+8、添加商品需要传入id并且没有唯一键约束不太合理  
 
 ### protoc 使用
 

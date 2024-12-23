@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"go.uber.org/zap"
+	"math/rand"
 	"mxshop_srvs/goods_srv/proto"
 	"testing"
 )
@@ -24,5 +25,41 @@ func TestGoodsList(t *testing.T) {
 		panic(err)
 	}
 	zap.S().Infof("rsp:%v", rsp.Data)
+
+}
+
+func TestBatchGetGoods(t *testing.T) {
+	rsp, err := GoodsClient.BatchGetGoods(context.Background(), &proto.BatchGoodsIdInfo{Id: []int32{421, 422}})
+	if err != nil {
+		panic(err)
+	}
+	zap.S().Infof("rsp:%v", rsp.Data)
+
+}
+
+func TestCreateGoods(t *testing.T) {
+	rsp, err := GoodsClient.CreateGoods(context.Background(), &proto.CreateGoodsInfo{
+		Id:              847,
+		Name:            "testCreate",
+		GoodsSn:         "",
+		Stocks:          0,
+		MarketPrice:     rand.Float32(),
+		ShopPrice:       rand.Float32(),
+		GoodsBrief:      "",
+		GoodsDesc:       "",
+		ShipFree:        false,
+		Images:          nil,
+		DescImages:      nil,
+		GoodsFrontImage: "",
+		IsNew:           false,
+		IsHot:           false,
+		OnSale:          false,
+		CategoryId:      136982,
+		BrandId:         614,
+	})
+	if err != nil {
+		panic(err)
+	}
+	zap.S().Infof("rsp:%v", rsp)
 
 }

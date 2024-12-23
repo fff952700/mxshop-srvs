@@ -44,7 +44,7 @@ type Goods struct {
 	IsHot           bool     `gorm:"default false;not null;comment '是否热门'"`
 	Name            string   `gorm:"type:varchar(255);not null"`
 	GoodsSn         string   `gorm:"type:varchar(50);not null;comment '内部编号'"`
-	CheckNum        int32    `gorm:"type:int;default 0;not null;comment '点击数'"`
+	ClickNum        int32    `gorm:"type:int;default 0;not null;comment '点击数'"`
 	SoldNum         int32    `gorm:"type:int;default 0;not null;comment '购买护士'"`
 	FavNum          int32    `gorm:"type:int;default 0;not null;comment '收藏数'"`
 	MarketPrice     float32  `gorm:"not null;comment '商品价格'"`
