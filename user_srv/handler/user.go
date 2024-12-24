@@ -42,9 +42,9 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 // model to proto
 func Model2Response(user model.User) *proto.UserInfoResponse {
 	UserInfoRsp := &proto.UserInfoResponse{
-		Id:       user.Id,
-		Mobile:   user.Mobile,
-		Password: user.Password,
+		Id:     user.Id,
+		Mobile: user.Mobile,
+		//Password: user.Password,
 		Nickname: user.Nickname,
 		Gender:   uint32(user.Gender),
 		Role:     uint32(user.Role),
@@ -128,7 +128,7 @@ func (u *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	pwd := fmt.Sprintf("sha512$%s$%s", salt, encodedPwd)
 
 	user.Password = pwd
-	user.Nickname = "test6"
+	user.Nickname = "test"
 	// 创建用户记录
 	tx := global.DB.Create(&user)
 	if tx.Error != nil {

@@ -21,23 +21,25 @@ import (
 
 func main() {
 	// 1、初始化zap
-	initialize.InitLogger()
-	// 2.获取配置
-	initialize.InitConfig()
-	// 3、mysql初始化
-	initialize.InitMysql()
-	svc := global.ServerConf.ServerInfo
+	//initialize.InitLogger()
+	//// 2.获取配置
+	//initialize.InitConfig()
+	//// 3、mysql初始化
+	//initialize.InitMysql()
+
 	// 4.随机port测试lb
 	debug := initialize.GetEnvInfo("MXSHOP_DEBUG")
-	if debug {
+	if !debug {
 		// 使用随机可用端口
 		port, err := utils.GetFreePort()
 		zap.S().Infof("random port:%d", port)
 		if err != nil {
 			zap.S().Panicw("service not port", "msg", err.Error())
 		}
-		svc.Port = port
+		global.ServerConf.ServerInfo.Port = port
 	}
+
+	svc := global.ServerConf.ServerInfo
 
 	// 4、grpc注册
 	server := grpc.NewServer()
@@ -52,7 +54,7 @@ func main() {
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
 	// 6、注册consul
-	initialize.InitConsul()
+	//initialize.InitConsul()
 
 	// 7、 服务发现
 	go func() {
