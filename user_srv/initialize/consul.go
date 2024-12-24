@@ -12,7 +12,7 @@ import (
 )
 
 // InitConsul 创建Consul客户端
-func InitConsul() {
+func init() {
 	// 实例化consul对象
 	config := api.DefaultConfig()
 	config.Address = fmt.Sprintf("%s:%d", global.ServerConf.ConsulInfo.Host, global.ServerConf.ConsulInfo.Port)
