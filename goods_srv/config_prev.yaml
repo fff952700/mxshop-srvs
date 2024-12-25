@@ -22,5 +22,5 @@ group: "dev"
 #  port: 8500
 #  name: "goods_srv"
 #  tag:
-#    - "goods"
+#    - "goods_srv"
 #    - "go"
