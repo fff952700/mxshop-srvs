@@ -6,21 +6,19 @@ dataId: "user-srv"
 group: "dev"
 
 #server:
-#  host: "192.168.2.106"
+#  host: 192.168.2.150
 #  port: 8080
-#  name: "user_srv"
-#
+#  name: user_srv
 #mysql:
-#  host: "192.168.2.106"
+#  host: 192.168.2.150
 #  port: 23306
-#  dbName: "mxshop"
-#  username: "root"
-#  password: "123456"
-#
+#  dbName: mxshop_user
+#  username: root
+#  password: '123456'
 #consul:
-#  host: "192.168.2.106"
+#  host: 192.168.2.150
 #  port: 8500
-#  name: "user_srv"
+#  name: user_srv
 #  tag:
-#    - "srv"
-#    - "go"
+#    - user_srv
+#    - go
