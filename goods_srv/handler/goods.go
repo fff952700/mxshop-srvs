@@ -87,7 +87,9 @@ func (g *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 
 	// 执行查询，将结果赋值给 GoodsList
 	localDB.Find(&goodsList)
-
+	if len(goodsList) < 1 {
+		return nil, status.Error(codes.NotFound, "")
+	}
 	// 将查询结果转为返回格式
 	goodsInfoResponse := g.Model2InfoResponse(goodsList)
 	// 设置返回的响应数据
