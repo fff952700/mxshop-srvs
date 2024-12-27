@@ -11,6 +11,7 @@
 6、goods_category_brand添加唯一索引category在前
 7、去掉手动初始化改为自动初始化  
 8、添加商品需要传入id并且没有唯一键约束不太合理  
+9、清晰数据生成新的sql  
 
 ### protoc 使用
 
