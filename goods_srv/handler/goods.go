@@ -54,7 +54,7 @@ func (g *GoodsServer) toGoodsInfoResponse(goods *model.Goods) *proto.GoodsInfoRe
 
 func (g *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterRequest) (*proto.GoodsListResponse, error) {
 	var (
-		goodsList         []model.Goods
+		goodsList         []*model.Goods
 		goodsListResponse = &proto.GoodsListResponse{}
 	)
 
