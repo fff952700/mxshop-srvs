@@ -42,9 +42,9 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 // model to proto
 func Model2Response(user model.User) *proto.UserInfoResponse {
 	UserInfoRsp := &proto.UserInfoResponse{
-		Id:     user.Id,
-		Mobile: user.Mobile,
-		//Password: user.Password,
+		Id:       user.Id,
+		Mobile:   user.Mobile,
+		Password: user.Password,
 		Nickname: user.Nickname,
 		Gender:   uint32(user.Gender),
 		Role:     uint32(user.Role),
@@ -125,7 +125,7 @@ func (u *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	// 加密密码
 	options := &password.Options{SaltLen: 16, Iterations: 100, KeyLen: 32, HashFunction: sha512.New}
 	salt, encodedPwd := password.Encode(req.Password, options)
-	pwd := fmt.Sprintf("sha512$%s$%s", salt, encodedPwd)
+	pwd := fmt.Sprintf("secret$sha512$%s$%s", salt, encodedPwd)
 
 	user.Password = pwd
 	user.Nickname = "test"
@@ -165,6 +165,7 @@ func (u *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 func (u *UserServer) CheckUserPasswd(ctx context.Context, req *proto.PasswordCheckInfo) (*proto.CheckResponse, error) {
 	options := &password.Options{SaltLen: 16, Iterations: 100, KeyLen: 32, HashFunction: sha512.New}
 	pwdInfo := strings.Split(req.EncryptedPassword, "$")
+
 	verify := password.Verify(req.Password, pwdInfo[2], pwdInfo[3], options)
 	return &proto.CheckResponse{
 		Success: verify,

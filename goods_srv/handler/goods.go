@@ -112,10 +112,6 @@ func (g *GoodsServer) BatchGetGoods(ctx context.Context, req *proto.BatchGoodsId
 }
 
 func (g *GoodsServer) CreateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*proto.GoodsInfoResponse, error) {
-	// TODO 需要传入新增id不合理
-	if req.Id == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid id")
-	}
 	var (
 		goodsItem = &model.Goods{
 			CategoryId:      req.CategoryId,
@@ -135,7 +131,7 @@ func (g *GoodsServer) CreateGoods(ctx context.Context, req *proto.CreateGoodsInf
 		}
 	)
 
-	if result := global.DB.Where("id = ?", req.Id).First(&goodsItem); result.RowsAffected == 1 {
+	if result := global.DB.Where("category_id = ? and brand_id = ? and name = ?", req.CategoryId, req.BrandId, req.Name).First(&goodsItem); result.RowsAffected == 1 {
 		return nil, status.Errorf(codes.AlreadyExists, " goods is exists")
 	}
 	global.DB.Create(goodsItem)

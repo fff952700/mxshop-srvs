@@ -30,12 +30,9 @@ func TestGetUserList(t *testing.T) {
 // 注册用户
 func TestCreateUser(t *testing.T) {
 	// GORM 的 Omit 或 Select 配置、零值处理机制导致的。GORM 默认会忽略值为零的字段，而用数据库的默认值来填充。
-	options := &password.Options{16, 100, 32, sha512.New}
-	salt, encodedPwd := password.Encode("123456", options)
-	pwd := fmt.Sprintf("$sha512$%s$%s", salt, encodedPwd)
 	UserClient.CreateUser(context.Background(), &proto.CreateUserInfo{
 		Mobile:   "13888888888",
-		Password: pwd,
+		Password: "123456",
 	})
 }
 
@@ -48,8 +45,9 @@ func TestPassWordCheck(t *testing.T) {
 	pwd := fmt.Sprintf("$sha512$%s$%s", salt, encodedPwd)
 	fmt.Println(pwd)
 	pwdInfo := strings.Split(pwd, "$")
+	fmt.Println(len(pwdInfo))
 	// 解密
-	verify := password.Verify("1111", pwdInfo[2], pwdInfo[3], options)
+	verify := password.Verify("123456", pwdInfo[2], pwdInfo[3], options)
 	fmt.Printf("verify:%v\n", verify)
 	//
 	result, err := UserClient.CheckUserPasswd(context.Background(), &proto.PasswordCheckInfo{
