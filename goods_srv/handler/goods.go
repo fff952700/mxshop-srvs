@@ -150,34 +150,44 @@ func (g *GoodsServer) DeleteGoods(ctx context.Context, req *proto.DeleteGoodsInf
 }
 
 func (g *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*emptypb.Empty, error) {
-	var (
-		goodsItem = &model.Goods{}
-	)
 
+	var goodsItem = &model.Goods{}
 	if result := global.DB.Where("id = ?", req.Id).First(&goodsItem); result.RowsAffected != 1 {
-		return nil, status.Errorf(codes.NotFound, " goods not found")
+		return nil, status.Errorf(codes.NotFound, "goods not found")
 	}
+
 	v := reflect.ValueOf(req).Elem() // 获取 req 的指针值
 	t := v.Type()
 
+	// 用来记录需要更新的字段
+	updates := map[string]interface{}{}
 	// 遍历所有字段
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 		fieldName := t.Field(i).Name
+		// 跳过 id 字段，不进行更新
+		if fieldName == "Id" {
+			continue
+		}
 
-		// 判断字段是否为空，并赋值给 goodsItem
-		// 跳过空字段的赋值
-		if !field.IsZero() { // IsZero 判断字段是否为零值 适用于各种字段类型
-			// 获取 goodsItem 的字段并赋值
+		// 判断字段是否为空，并准备更新
+		if !field.IsZero() { // 如果字段不为空，则准备更新
+			// 获取 goodsItem 的字段
 			if goodsField := reflect.ValueOf(goodsItem).Elem().FieldByName(fieldName); goodsField.IsValid() && goodsField.CanSet() {
-				// 赋值
-				goodsField.Set(field)
+				// 将字段值加入更新列表
+				updates[fieldName] = field.Interface()
 			}
 		}
 	}
-	global.DB.Save(&goodsItem)
-	return &emptypb.Empty{}, nil
 
+	// 如果有需要更新的字段，执行更新
+	if len(updates) > 0 {
+		if err := global.DB.Model(&goodsItem).Updates(updates).Error; err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to update goods: %v", err)
+		}
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
 func (g *GoodsServer) GetGoodsDetail(ctx context.Context, req *proto.GoodInfoRequest) (*proto.GoodsInfoResponse, error) {
