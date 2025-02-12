@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"mxshop_srvs/inventory_srv/handler"
-	"mxshop_srvs/inventory_srv/proto"
-	"mxshop_srvs/inventory_srv/utils/register/consul"
 	"net"
 	"os"
 	"os/signal"
@@ -16,8 +13,11 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"mxshop_srvs/inventory_srv/global"
+	"mxshop_srvs/inventory_srv/handler"
 	"mxshop_srvs/inventory_srv/initialize"
+	"mxshop_srvs/inventory_srv/proto"
 	"mxshop_srvs/inventory_srv/utils"
+	"mxshop_srvs/inventory_srv/utils/register/consul"
 )
 
 func main() {

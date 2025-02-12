@@ -3,12 +3,12 @@ package initialize
 import (
 	"encoding/json"
 	"fmt"
-	"go.uber.org/zap"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 
 	"mxshop_srvs/inventory_srv/global"
 )

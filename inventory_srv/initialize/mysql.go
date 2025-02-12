@@ -2,11 +2,11 @@ package initialize
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"log"
 	"os"
 	"time"
 
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
