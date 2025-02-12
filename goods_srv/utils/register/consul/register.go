@@ -1,18 +1,32 @@
-package initialize
+package consul
 
 import (
 	"fmt"
-	"strconv"
-	"time"
-
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
-
 	"mxshop_srvs/goods_srv/global"
+	"strconv"
+	"time"
 )
 
-// InitConsul 创建Consul客户端
-func init() {
+type Register struct {
+	Host string
+	Port int
+}
+
+type RegisterClient interface {
+	Register() error
+	Deregister() error
+}
+
+func NewRegisterClient(host string, port int) RegisterClient {
+	return &Register{
+		Host: host,
+		Port: port,
+	}
+}
+
+func (r Register) Register() error {
 	// 实例化consul对象
 	config := api.DefaultConfig()
 	config.Address = fmt.Sprintf("%s:%d", global.ServerConf.ConsulInfo.Host, global.ServerConf.ConsulInfo.Port)
@@ -22,11 +36,6 @@ func init() {
 
 	}
 	global.Consul = client
-	registerService()
-}
-
-// registerService 将gRPC服务注册到consul
-func registerService() {
 	// 健康检查
 	check := &api.AgentServiceCheck{
 		GRPC:     fmt.Sprintf("%s:%d", global.ServerConf.ServerInfo.Host, global.ServerConf.ServerInfo.Port), //
@@ -45,9 +54,12 @@ func registerService() {
 		Port:    global.ServerConf.ServerInfo.Port,
 		Check:   check,
 	}
-	err := global.Consul.Agent().ServiceRegister(registration)
-	if err != nil {
-		zap.S().Panicw("[InitConsul] register service fail", err)
-	}
+	err = client.Agent().ServiceRegister(registration)
+	return err
+}
 
+func (r Register) Deregister() error {
+	id := global.ServerConf.ConsulInfo.Id
+	err := global.Consul.Agent().ServiceDeregister(id)
+	return err
 }

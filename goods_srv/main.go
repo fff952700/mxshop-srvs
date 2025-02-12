@@ -17,15 +17,11 @@ import (
 	"mxshop_srvs/goods_srv/initialize"
 	"mxshop_srvs/goods_srv/proto"
 	"mxshop_srvs/goods_srv/utils"
+	"mxshop_srvs/goods_srv/utils/register/consul"
 )
 
 func main() {
-	// 1、初始化zap
-	//initialize.InitLogger()
-	//// 2.获取配置
-	//initialize.InitConfig()
-	// 3、mysql初始化
-	//initialize.InitMysql()
+
 	svc := global.ServerConf.ServerInfo
 	// 4.随机port测试lb
 	debug := initialize.GetEnvInfo("MXSHOP_DEBUG")
@@ -51,8 +47,11 @@ func main() {
 	// 5、注册健康检查
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
-	// 6、注册consul
-	//initialize.InitConsul()
+	client := consul.NewRegisterClient(svc.Host, svc.Port)
+	err = client.Register()
+	if err != nil {
+		zap.S().Panicw("consul register failed", "msg", err.Error())
+	}
 
 	// 7、 服务发现
 	go func() {
