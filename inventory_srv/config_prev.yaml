@@ -1,0 +1,26 @@
+host: "192.168.2.150"
+port: 8848
+scheme: "http"
+namespace: "fc0ce086-0fee-4aba-b871-caf5906015f6"
+dataId: "inventory-srv"
+group: "dev"
+
+#server:
+#  host: "192.168.2.150"
+#  port: 8082
+#  name: "inventory_srv"
+#
+#mysql:
+#  host: "192.168.2.150"
+#  port: 23306
+#  dbName: "mxshop_inventory"
+#  username: "root"
+#  password: "123456"
+#
+#consul:
+#  host: "192.168.2.150"
+#  port: 8500
+#  name: "inventory_srv"
+#  tag:
+#    - "inventory_srv"
+#    - "go"
