@@ -22,7 +22,7 @@ func (i *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (
 	if result := global.DB.Where(&model.Inventory{GoodsId: req.GoodsId}).First(inv); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "goods inventory not found")
 	}
-	global.DB.Where("goods_id = ?", req.GoodsId).Updates(&model.Inventory{GoodsNum: req.Num})
+	global.DB.Where("goods_id = ?", req.GoodsId).Updates(&model.Inventory{Stocks: req.Stocks})
 	return &emptypb.Empty{}, nil
 
 }
@@ -34,7 +34,7 @@ func (i *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 	}
 	data := &proto.GoodsInvInfo{
 		GoodsId: inventory.GoodsId,
-		Num:     inventory.GoodsNum,
+		Stocks:  inventory.Stocks,
 	}
 	return data, nil
 

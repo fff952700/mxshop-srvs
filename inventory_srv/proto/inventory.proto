@@ -11,7 +11,7 @@ service Inventory{
 
 message GoodsInvInfo {
   int32 GoodsId = 1;
-  int32 Num = 2;
+  int32 Stocks = 2;
 }
 
 message SellInfo{

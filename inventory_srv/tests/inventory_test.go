@@ -23,8 +23,8 @@ func TestInitAddInventory(t *testing.T) {
 	for _, v := range GoodsList {
 		// 每次循环创建新的 Inventory 实例
 		inventory := &model.Inventory{
-			GoodsId:  v.Id,
-			GoodsNum: rand.Int31n(100),
+			GoodsId: v.Id,
+			Stocks:  rand.Int31n(100),
 		}
 		InventoryList = append(InventoryList, inventory)
 	}
@@ -34,7 +34,7 @@ func TestInitAddInventory(t *testing.T) {
 func TestSetInv(t *testing.T) {
 	_, err := InventoryClient.SetInv(context.Background(), &proto.GoodsInvInfo{
 		GoodsId: 1,
-		Num:     345,
+		Stocks:  345,
 	})
 	if err != nil {
 		t.Error(err)
