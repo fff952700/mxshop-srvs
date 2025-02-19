@@ -128,7 +128,7 @@ func (u *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	pwd := fmt.Sprintf("secret$sha512$%s$%s", salt, encodedPwd)
 
 	user.Password = pwd
-	user.Nickname = "test"
+	user.Nickname = "tests"
 	// 创建用户记录
 	tx := global.DB.Create(&user)
 	if tx.Error != nil {

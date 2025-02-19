@@ -33,8 +33,8 @@ func TestInitAddInventory(t *testing.T) {
 
 func TestSetInv(t *testing.T) {
 	_, err := InventoryClient.SetInv(context.Background(), &proto.GoodsInvInfo{
-		GoodsId: 1,
-		Stocks:  345,
+		GoodsId: 428,
+		Stocks:  47,
 	})
 	if err != nil {
 		t.Error(err)
@@ -43,10 +43,23 @@ func TestSetInv(t *testing.T) {
 
 func TestInvDetail(t *testing.T) {
 	data, err := InventoryClient.InvDetail(context.Background(), &proto.GoodsInvInfo{
-		GoodsId: 1,
+		GoodsId: 428,
 	})
 	if err != nil {
 		t.Error(err)
 	}
 	t.Log(data)
+}
+
+func TestSell(t *testing.T) {
+	_, err := InventoryClient.Sell(context.Background(), &proto.SellInfo{
+		GoodsInfo: []*proto.GoodsInvInfo{
+			{GoodsId: 428, Stocks: 1},
+			{GoodsId: 427, Stocks: 2},
+		},
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log("success")
 }
