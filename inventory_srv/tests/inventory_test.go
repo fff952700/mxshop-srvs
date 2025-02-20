@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"sync"
 	"testing"
 
 	"math/rand"
@@ -52,14 +53,24 @@ func TestInvDetail(t *testing.T) {
 }
 
 func TestSell(t *testing.T) {
-	_, err := InventoryClient.Sell(context.Background(), &proto.SellInfo{
-		GoodsInfo: []*proto.GoodsInvInfo{
-			{GoodsId: 428, Stocks: 1},
-			{GoodsId: 427, Stocks: 2},
-		},
-	})
-	if err != nil {
-		t.Error(err)
+	// 测试并发访问 TODO 没有锁并发访问下获取的stocks可能相同
+	var wg sync.WaitGroup
+
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func() {
+			_, err := InventoryClient.Sell(context.Background(), &proto.SellInfo{
+				GoodsInfo: []*proto.GoodsInvInfo{
+					{GoodsId: 428, Stocks: 1},
+				},
+			})
+			defer wg.Done()
+			if err != nil {
+				t.Error(err)
+			}
+		}()
+
 	}
+	wg.Wait()
 	t.Log("success")
 }

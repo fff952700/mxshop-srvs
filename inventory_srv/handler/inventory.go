@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"sync"
 
 	"mxshop_srvs/inventory_srv/global"
 	"mxshop_srvs/inventory_srv/model"
@@ -42,6 +43,8 @@ func (i *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 
 }
 
+var wg sync.Mutex
+
 // 扣减库存
 func (i *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	tx := global.DB.Begin()
@@ -54,6 +57,7 @@ func (i *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 	for _, goods := range req.GoodsInfo {
 		// 每次循环创建新实例，避免条件污染
 		inv := &model.Inventory{}
+		wg.Lock()
 		// 明确使用goods_id查询，避免结构体字段污染
 		if result := tx.Where("goods_id = ?", goods.GoodsId).First(inv); result.RowsAffected == 0 {
 			tx.Rollback()
@@ -77,7 +81,7 @@ func (i *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 	if err := tx.Commit().Error; err != nil {
 		return nil, status.Errorf(codes.Internal, "提交事务失败: %v", err)
 	}
-
+	wg.Unlock()
 	return &emptypb.Empty{}, nil
 }
 
