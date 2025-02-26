@@ -2,8 +2,9 @@ package model
 
 type Inventory struct {
 	BaseModel
-	GoodsId int32 `gorm:"type:int;unique;NOT NULL;"`
-	Stocks  int32 `gorm:"type:int;NOT NULL;"`
+	GoodsId int32  `gorm:"type:int;unique;NOT NULL;"`
+	Stocks  int32  `gorm:"type:int;NOT NULL;"`
+	Version uint32 `gorm:"type:int unsigned;NOT NULL;"`
 }
 
 type InventoryHistory struct {
