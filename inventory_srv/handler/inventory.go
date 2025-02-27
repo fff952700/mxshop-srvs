@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"github.com/go-redsync/redsync/v4"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -47,6 +50,17 @@ func (i *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 	tx := global.DB.Begin()
 	for _, goodsInfo := range req.GoodsInfo {
 		for {
+			// 先获取锁
+			mutex := global.RedisClient.NewMutex(fmt.Sprintf("mutex_goods_%d", goodsInfo.GoodsId))
+			if err := mutex.Lock(); err != nil {
+				return nil, status.Errorf(codes.Internal, "内部错误")
+			}
+			defer func(mutex *redsync.Mutex) {
+				_, err := mutex.Unlock()
+				if err != nil {
+					zap.S().Errorf(fmt.Sprintf("mutex_goods_%d 解锁失败", goodsInfo.GoodsId))
+				}
+			}(mutex)
 			var inv = &model.Inventory{}
 			if result := global.DB.Where("goods_id = ?", goodsInfo.GoodsId).First(inv); result.RowsAffected == 0 {
 				tx.Rollback()
@@ -56,10 +70,9 @@ func (i *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 				tx.Rollback()
 			}
 			inv.Stocks -= goodsInfo.Stocks
-			if result := tx.Where("goods_id = ? and version = ?", goodsInfo.GoodsId, inv.Version).Select("stocks", "version").Updates(&model.Inventory{Stocks: inv.Stocks, Version: inv.Version + 1}); result.RowsAffected == 1 {
+			if result := tx.Where("goods_id = ?", goodsInfo.GoodsId).Updates(&model.Inventory{Stocks: inv.Stocks}); result.RowsAffected == 1 {
 				break
 			}
-
 		}
 	}
 	tx.Commit()

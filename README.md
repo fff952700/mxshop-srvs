@@ -17,6 +17,8 @@
   2) go的sync.Mutex 它保证同一时刻只有一个 goroutine 能够访问受保护的资源,适用于写操作(适用于单机)  
   3) 乐观锁 在go中通过版本号或者时间戳等控制。适用于低频读写(适用于分布式系统)
   4) 使用mysql的for update 在where带有索引的情况下变为行锁（无索引会升级为表锁）。适用高并发下的读写  
+  5) 使用redis分布式锁redsync:
+  >https://github.com/go-redsync/redsync  
 
 ### protoc 使用
 

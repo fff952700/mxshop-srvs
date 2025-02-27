@@ -58,7 +58,7 @@ func TestSell(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func() {
 			_, err := InventoryClient.Sell(context.Background(), &proto.SellInfo{
 				GoodsInfo: []*proto.GoodsInvInfo{
 					{GoodsId: 428, Stocks: 1},
@@ -68,7 +68,7 @@ func TestSell(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-		}(i)
+		}()
 	}
 	wg.Wait()
 	t.Log("success")

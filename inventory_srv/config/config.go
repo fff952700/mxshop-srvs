@@ -5,6 +5,7 @@ type ServerCfg struct {
 	ServerInfo ServerConfig `mapstructure:"server" json:"server"`
 	MysqlInfo  MysqlConfig  `mapstructure:"mysql" json:"mysql"`
 	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
+	RedisInfo  RedisConfig  `mapstructure:"redis" json:"redis"`
 }
 
 type ServerConfig struct {
@@ -37,4 +38,11 @@ type NacosConfig struct {
 	Namespace string `mapstructure:"namespace"`
 	DataId    string `mapstructure:"dataId"`
 	Group     string `mapstructure:"group"`
+}
+
+type RedisConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
 }
