@@ -56,7 +56,7 @@ func TestSell(t *testing.T) {
 	// 测试并发访问 TODO 没有锁并发访问下获取的stocks可能相同
 	var wg sync.WaitGroup
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func() {
 			_, err := InventoryClient.Sell(context.Background(), &proto.SellInfo{
