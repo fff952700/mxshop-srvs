@@ -2,16 +2,21 @@ package service
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/alibabacloud-go/tea/tea"
@@ -19,21 +24,62 @@ import (
 
 var defaultUserAgent = fmt.Sprintf("AlibabaCloud (%s; %s) Golang/%s Core/%s TeaDSL/1", runtime.GOOS, runtime.GOARCH, strings.Trim(runtime.Version(), "go"), "0.01")
 
+type ExtendsParameters struct {
+	Headers map[string]*string `json:"headers,omitempty" xml:"headers,omitempty"`
+	Queries map[string]*string `json:"queries,omitempty" xml:"queries,omitempty"`
+}
+
+func (s ExtendsParameters) String() string {
+	return tea.Prettify(s)
+}
+
+func (s ExtendsParameters) GoString() string {
+	return s.String()
+}
+
+func (s *ExtendsParameters) SetHeaders(v map[string]*string) *ExtendsParameters {
+	s.Headers = v
+	return s
+}
+
+func (s *ExtendsParameters) SetQueries(v map[string]*string) *ExtendsParameters {
+	s.Queries = v
+	return s
+}
+
 type RuntimeOptions struct {
-	Autoretry      *bool   `json:"autoretry" xml:"autoretry"`
-	IgnoreSSL      *bool   `json:"ignoreSSL" xml:"ignoreSSL"`
-	MaxAttempts    *int    `json:"maxAttempts" xml:"maxAttempts"`
-	BackoffPolicy  *string `json:"backoffPolicy" xml:"backoffPolicy"`
-	BackoffPeriod  *int    `json:"backoffPeriod" xml:"backoffPeriod"`
-	ReadTimeout    *int    `json:"readTimeout" xml:"readTimeout"`
-	ConnectTimeout *int    `json:"connectTimeout" xml:"connectTimeout"`
-	LocalAddr      *string `json:"localAddr" xml:"localAddr"`
-	HttpProxy      *string `json:"httpProxy" xml:"httpProxy"`
-	HttpsProxy     *string `json:"httpsProxy" xml:"httpsProxy"`
-	NoProxy        *string `json:"noProxy" xml:"noProxy"`
-	MaxIdleConns   *int    `json:"maxIdleConns" xml:"maxIdleConns"`
-	Socks5Proxy    *string `json:"socks5Proxy" xml:"socks5Proxy"`
-	Socks5NetWork  *string `json:"socks5NetWork" xml:"socks5NetWork"`
+	Autoretry         *bool              `json:"autoretry" xml:"autoretry"`
+	IgnoreSSL         *bool              `json:"ignoreSSL" xml:"ignoreSSL"`
+	Key               *string            `json:"key,omitempty" xml:"key,omitempty"`
+	Cert              *string            `json:"cert,omitempty" xml:"cert,omitempty"`
+	Ca                *string            `json:"ca,omitempty" xml:"ca,omitempty"`
+	MaxAttempts       *int               `json:"maxAttempts" xml:"maxAttempts"`
+	BackoffPolicy     *string            `json:"backoffPolicy" xml:"backoffPolicy"`
+	BackoffPeriod     *int               `json:"backoffPeriod" xml:"backoffPeriod"`
+	ReadTimeout       *int               `json:"readTimeout" xml:"readTimeout"`
+	ConnectTimeout    *int               `json:"connectTimeout" xml:"connectTimeout"`
+	LocalAddr         *string            `json:"localAddr" xml:"localAddr"`
+	HttpProxy         *string            `json:"httpProxy" xml:"httpProxy"`
+	HttpsProxy        *string            `json:"httpsProxy" xml:"httpsProxy"`
+	NoProxy           *string            `json:"noProxy" xml:"noProxy"`
+	MaxIdleConns      *int               `json:"maxIdleConns" xml:"maxIdleConns"`
+	Socks5Proxy       *string            `json:"socks5Proxy" xml:"socks5Proxy"`
+	Socks5NetWork     *string            `json:"socks5NetWork" xml:"socks5NetWork"`
+	KeepAlive         *bool              `json:"keepAlive" xml:"keepAlive"`
+	ExtendsParameters *ExtendsParameters `json:"extendsParameters,omitempty" xml:"extendsParameters,omitempty"`
+}
+
+var processStartTime int64 = time.Now().UnixNano() / 1e6
+var seqId int64 = 0
+
+func getGID() uint64 {
+	// https://blog.sgmansfield.com/2015/12/goroutine-ids/
+	b := make([]byte, 64)
+	b = b[:runtime.Stack(b, false)]
+	b = bytes.TrimPrefix(b, []byte("goroutine "))
+	b = b[:bytes.IndexByte(b, ' ')]
+	n, _ := strconv.ParseUint(string(b), 10, 64)
+	return n
 }
 
 func (s RuntimeOptions) String() string {
@@ -51,6 +97,21 @@ func (s *RuntimeOptions) SetAutoretry(v bool) *RuntimeOptions {
 
 func (s *RuntimeOptions) SetIgnoreSSL(v bool) *RuntimeOptions {
 	s.IgnoreSSL = &v
+	return s
+}
+
+func (s *RuntimeOptions) SetKey(v string) *RuntimeOptions {
+	s.Key = &v
+	return s
+}
+
+func (s *RuntimeOptions) SetCert(v string) *RuntimeOptions {
+	s.Cert = &v
+	return s
+}
+
+func (s *RuntimeOptions) SetCa(v string) *RuntimeOptions {
+	s.Ca = &v
 	return s
 }
 
@@ -114,6 +175,16 @@ func (s *RuntimeOptions) SetSocks5NetWork(v string) *RuntimeOptions {
 	return s
 }
 
+func (s *RuntimeOptions) SetKeepAlive(v bool) *RuntimeOptions {
+	s.KeepAlive = &v
+	return s
+}
+
+func (s *RuntimeOptions) SetExtendsParameters(v *ExtendsParameters) *RuntimeOptions {
+	s.ExtendsParameters = v
+	return s
+}
+
 func ReadAsString(body io.Reader) (*string, error) {
 	byt, err := ioutil.ReadAll(body)
 	if err != nil {
@@ -130,13 +201,7 @@ func StringifyMapValue(a map[string]interface{}) map[string]*string {
 	res := make(map[string]*string)
 	for key, value := range a {
 		if value != nil {
-			switch value.(type) {
-			case string:
-				res[key] = tea.String(value.(string))
-			default:
-				byt, _ := json.Marshal(value)
-				res[key] = tea.String(string(byt))
-			}
+			res[key] = ToJSONString(value)
 		}
 	}
 	return res
@@ -184,11 +249,13 @@ func ToJSONString(a interface{}) *string {
 		}
 		return tea.String(string(byt))
 	}
-	byt, err := json.Marshal(a)
-	if err != nil {
+	byt := bytes.NewBuffer([]byte{})
+	jsonEncoder := json.NewEncoder(byt)
+	jsonEncoder.SetEscapeHTML(false)
+	if err := jsonEncoder.Encode(a); err != nil {
 		return nil
 	}
-	return tea.String(string(byt))
+	return tea.String(string(bytes.TrimSpace(byt.Bytes())))
 }
 
 func DefaultNumber(reaNum, defaultNum *int) *int {
@@ -217,7 +284,15 @@ func ReadAsJSON(body io.Reader) (result interface{}, err error) {
 }
 
 func GetNonce() *string {
-	return tea.String(getUUID())
+	routineId := getGID()
+	currentTime := time.Now().UnixNano() / 1e6
+	seq := atomic.AddInt64(&seqId, 1)
+	randNum := rand.Int63()
+	msg := fmt.Sprintf("%d-%d-%d-%d-%d", processStartTime, routineId, currentTime, seq, randNum)
+	h := md5.New()
+	h.Write([]byte(msg))
+	ret := hex.EncodeToString(h.Sum(nil))
+	return &ret
 }
 
 func Empty(val *string) *bool {
@@ -259,10 +334,10 @@ func ToBytes(a *string) []byte {
 	return []byte(tea.StringValue(a))
 }
 
-func AssertAsMap(a interface{}) map[string]interface{} {
+func AssertAsMap(a interface{}) (_result map[string]interface{}, _err error) {
 	r := reflect.ValueOf(a)
 	if r.Kind().String() != "map" {
-		panic(fmt.Sprintf("%v is not a map[string]interface{}", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a map[string]interface{}", a))
 	}
 
 	res := make(map[string]interface{})
@@ -271,10 +346,10 @@ func AssertAsMap(a interface{}) map[string]interface{} {
 		res[key.String()] = r.MapIndex(key).Interface()
 	}
 
-	return res
+	return res, nil
 }
 
-func AssertAsNumber(a interface{}) *int {
+func AssertAsNumber(a interface{}) (_result *int, _err error) {
 	res := 0
 	switch a.(type) {
 	case int:
@@ -284,13 +359,33 @@ func AssertAsNumber(a interface{}) *int {
 		tmp := a.(*int)
 		res = tea.IntValue(tmp)
 	default:
-		panic(fmt.Sprintf("%v is not a int", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a int", a))
 	}
 
-	return tea.Int(res)
+	return tea.Int(res), nil
 }
 
-func AssertAsBoolean(a interface{}) *bool {
+/**
+ * Assert a value, if it is a integer, return it, otherwise throws
+ * @return the integer value
+ */
+func AssertAsInteger(value interface{}) (_result *int, _err error) {
+	res := 0
+	switch value.(type) {
+	case int:
+		tmp := value.(int)
+		res = tmp
+	case *int:
+		tmp := value.(*int)
+		res = tea.IntValue(tmp)
+	default:
+		return nil, errors.New(fmt.Sprintf("%v is not a int", value))
+	}
+
+	return tea.Int(res), nil
+}
+
+func AssertAsBoolean(a interface{}) (_result *bool, _err error) {
 	res := false
 	switch a.(type) {
 	case bool:
@@ -300,13 +395,13 @@ func AssertAsBoolean(a interface{}) *bool {
 		tmp := a.(*bool)
 		res = tea.BoolValue(tmp)
 	default:
-		panic(fmt.Sprintf("%v is not a bool", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a bool", a))
 	}
 
-	return tea.Bool(res)
+	return tea.Bool(res), nil
 }
 
-func AssertAsString(a interface{}) *string {
+func AssertAsString(a interface{}) (_result *string, _err error) {
 	res := ""
 	switch a.(type) {
 	case string:
@@ -316,39 +411,39 @@ func AssertAsString(a interface{}) *string {
 		tmp := a.(*string)
 		res = tea.StringValue(tmp)
 	default:
-		panic(fmt.Sprintf("%v is not a string", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a string", a))
 	}
 
-	return tea.String(res)
+	return tea.String(res), nil
 }
 
-func AssertAsBytes(a interface{}) []byte {
+func AssertAsBytes(a interface{}) (_result []byte, _err error) {
 	res, ok := a.([]byte)
 	if !ok {
-		panic(fmt.Sprintf("%v is not []byte", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a []byte", a))
 	}
-	return res
+	return res, nil
 }
 
-func AssertAsReadable(a interface{}) io.Reader {
+func AssertAsReadable(a interface{}) (_result io.Reader, _err error) {
 	res, ok := a.(io.Reader)
 	if !ok {
-		panic(fmt.Sprintf("%v is not reader", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a reader", a))
 	}
-	return res
+	return res, nil
 }
 
-func AssertAsArray(a interface{}) []interface{} {
+func AssertAsArray(a interface{}) (_result []interface{}, _err error) {
 	r := reflect.ValueOf(a)
 	if r.Kind().String() != "array" && r.Kind().String() != "slice" {
-		panic(fmt.Sprintf("%v is not a [x]interface{}", a))
+		return nil, errors.New(fmt.Sprintf("%v is not a []interface{}", a))
 	}
 	aLen := r.Len()
 	res := make([]interface{}, 0)
 	for i := 0; i < aLen; i++ {
 		res = append(res, r.Index(i).Interface())
 	}
-	return res
+	return res, nil
 }
 
 func ParseJSON(a *string) interface{} {

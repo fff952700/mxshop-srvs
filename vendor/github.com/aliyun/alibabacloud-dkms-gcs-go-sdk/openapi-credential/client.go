@@ -1,25 +1,26 @@
-package openapi_credential
+// This file is auto-generated, don't edit it. Thanks.
+package client
 
 import (
-	"encoding/base64"
-	"encoding/json"
-	"encoding/pem"
-	"errors"
-	util "github.com/alibabacloud-go/tea-utils/service"
+	encodeutil "github.com/alibabacloud-go/darabonba-encode-util/client"
+	util "github.com/alibabacloud-go/tea-utils/v2/service"
 	"github.com/alibabacloud-go/tea/tea"
-	"github.com/aliyun/alibabacloud-dkms-gcs-go-sdk/openapi-credential/auth"
-	"github.com/aliyun/alibabacloud-dkms-gcs-go-sdk/openapi-credential/provider"
-	"golang.org/x/crypto/pkcs12"
-	"io/ioutil"
+	dedicatedkmsopenapiutil "github.com/aliyun/alibabacloud-dkms-gcs-go-sdk/openapi-util"
 )
 
 type Config struct {
-	Type             *string `json:"type,omitempty" xml:"type,omitempty" require:"true"`
-	AccessKeyId      *string `json:"accessKeyId,omitempty" xml:"accessKeyId,omitempty"`
-	PrivateKey       *string `json:"privateKey,omitempty" xml:"privateKey,omitempty"`
-	ClientKeyFile    *string `json:"clientKeyFile,omitempty" xml:"clientKeyFile,omitempty"`
-	ClientKeyContent *string `json:"clientKeyContent,omitempty" xml:"clientKeyContent,omitempty"`
-	Password         *string `json:"password,omitempty" xml:"password,omitempty"`
+	// 访问凭证类型
+	Type *string `json:"Type,omitempty" xml:"Type,omitempty" require:"true"`
+	// 访问凭证ID
+	AccessKeyId *string `json:"Type,omitempty" xml:"Type,omitempty"`
+	// pkcs1 或 pkcs8 PEM 格式私钥
+	PrivateKey *string `json:"Type,omitempty" xml:"Type,omitempty"`
+	// ClientKey文件路径
+	ClientKeyFile *string `json:"Type,omitempty" xml:"Type,omitempty"`
+	// ClientKey文件内容
+	ClientKeyContent *string `json:"Type,omitempty" xml:"Type,omitempty"`
+	// ClientKey密码
+	Password *string `json:"Type,omitempty" xml:"Type,omitempty"`
 }
 
 func (s Config) String() string {
@@ -60,32 +61,35 @@ func (s *Config) SetPassword(v string) *Config {
 	return s
 }
 
-type ClientKey struct {
-	KeyId          *string `json:"KeyId,omitempty" xml:"KeyId,omitempty"`
-	PrivateKeyData *string `json:"PrivateKeyData,omitempty" xml:"PrivateKeyData,omitempty"`
+type RsaKeyPairCredentials struct {
+	// 访问凭证私钥
+	PrivateKeySecret *string `json:"privateKeySecret,omitempty" xml:"privateKeySecret,omitempty"`
+	// 访问凭证ID
+	KeyId *string `json:"keyId,omitempty" xml:"keyId,omitempty"`
 }
 
-func (s ClientKey) String() string {
+func (s RsaKeyPairCredentials) String() string {
 	return tea.Prettify(s)
 }
 
-func (s ClientKey) GoString() string {
+func (s RsaKeyPairCredentials) GoString() string {
 	return s.String()
 }
 
-func (s *ClientKey) SetKeyId(v string) *ClientKey {
+func (s *RsaKeyPairCredentials) SetPrivateKeySecret(v string) *RsaKeyPairCredentials {
+	s.PrivateKeySecret = &v
+	return s
+}
+
+func (s *RsaKeyPairCredentials) SetKeyId(v string) *RsaKeyPairCredentials {
 	s.KeyId = &v
 	return s
 }
 
-func (s *ClientKey) SetPrivateKeyData(v string) *ClientKey {
-	s.PrivateKeyData = &v
-	return s
-}
-
 type Client struct {
-	CredentialsProvider provider.AlibabaCloudCredentialsProvider
-	ClientKeyCertPem    string
+	KeyId            *string
+	PrivateKeySecret *string
+	PrivateKeyCert   *string
 }
 
 func NewClient(config *Config) (*Client, error) {
@@ -95,72 +99,105 @@ func NewClient(config *Config) (*Client, error) {
 }
 
 func (client *Client) Init(config *Config) (_err error) {
-	if tea.BoolValue(util.EqualString(config.Type, tea.String("rsa_key_pair"))) {
+	if tea.BoolValue(util.EqualString(tea.String("rsa_key_pair"), config.Type)) {
 		if !tea.BoolValue(util.Empty(config.ClientKeyContent)) {
-			clientKey := &ClientKey{}
-			certPem, privateKeyPem, err := client.parseClientKeyContent(tea.StringValue(config.ClientKeyContent), tea.StringValue(config.Password), clientKey)
-			if err != nil {
-				return err
+			json := util.ParseJSON(config.ClientKeyContent)
+			clientKey, _err := util.AssertAsMap(json)
+			if _err != nil {
+				return _err
 			}
-			client.ClientKeyCertPem = certPem
-			client.CredentialsProvider = provider.NewRsaKeyPairCredentialProvider(tea.StringValue(clientKey.KeyId), privateKeyPem)
+
+			base64DecodeTmp, err := util.AssertAsString(clientKey["PrivateKeyData"])
+			if err != nil {
+				_err = err
+				return _err
+			}
+			privateKeyData := encodeutil.Base64Decode(base64DecodeTmp)
+			privateKeyFromContent, _err := dedicatedkmsopenapiutil.GetPrivatePemFromPk12(privateKeyData, config.Password)
+			if _err != nil {
+				return _err
+			}
+
+			client.PrivateKeySecret = privateKeyFromContent[0]
+			client.PrivateKeyCert = privateKeyFromContent[1]
+			client.KeyId, _err = util.AssertAsString(clientKey["KeyId"])
+			if _err != nil {
+				return _err
+			}
+
 		} else if !tea.BoolValue(util.Empty(config.ClientKeyFile)) {
-			clientKey := &ClientKey{}
-			content, err := ioutil.ReadFile(tea.StringValue(config.ClientKeyFile))
-			if err != nil {
-				return err
+			jsonFromFile, _err := dedicatedkmsopenapiutil.ReadJsonFile(config.ClientKeyFile)
+			if _err != nil {
+				return _err
 			}
-			certPem, privateKeyPem, err := client.parseClientKeyContent(string(content), tea.StringValue(config.Password), clientKey)
-			if err != nil {
-				return err
+
+			if tea.BoolValue(util.IsUnset(jsonFromFile)) {
+				_err = tea.NewSDKError(map[string]interface{}{
+					"message": "read client key file failed: " + tea.StringValue(config.ClientKeyFile),
+				})
+				return _err
 			}
-			client.ClientKeyCertPem = certPem
-			client.CredentialsProvider = provider.NewRsaKeyPairCredentialProvider(tea.StringValue(clientKey.KeyId), privateKeyPem)
+
+			clientKeyFromFile, _err := util.AssertAsMap(jsonFromFile)
+			if _err != nil {
+				return _err
+			}
+
+			base64DecodeTmp, err := util.AssertAsString(clientKeyFromFile["PrivateKeyData"])
+			if err != nil {
+				_err = err
+				return _err
+			}
+			privateKeyDataFromFile := encodeutil.Base64Decode(base64DecodeTmp)
+			privateKeyFromFile, _err := dedicatedkmsopenapiutil.GetPrivatePemFromPk12(privateKeyDataFromFile, config.Password)
+			if _err != nil {
+				return _err
+			}
+
+			client.PrivateKeySecret = privateKeyFromFile[0]
+			client.PrivateKeyCert = privateKeyFromFile[1]
+			client.KeyId, _err = util.AssertAsString(clientKeyFromFile["KeyId"])
+			if _err != nil {
+				return _err
+			}
+
 		} else {
-			client.CredentialsProvider = provider.NewRsaKeyPairCredentialProvider(tea.StringValue(config.AccessKeyId), tea.StringValue(config.PrivateKey))
+			client.PrivateKeySecret = config.PrivateKey
+			client.KeyId = config.AccessKeyId
 		}
+
 	} else {
-		return errors.New("only support rsa key pair credential provider now")
+		_err = tea.NewSDKError(map[string]interface{}{
+			"message": "Only support rsa key pair credential provider now.",
+		})
+		return _err
 	}
+
 	return nil
 }
 
 func (client *Client) GetAccessKeyId() (_result *string) {
-	_result = tea.String(client.CredentialsProvider.GetCredentials().GetAccessKeyId())
-	return
+	_result = client.KeyId
+	return _result
 }
 
 func (client *Client) GetAccessKeySecret() (_result *string) {
-	_result = tea.String(client.CredentialsProvider.GetCredentials().GetAccessKeySecret())
-	return
+	_result = client.PrivateKeySecret
+	return _result
 }
 
-func (client *Client) GetClientKeyCertPem() string {
-	return client.ClientKeyCertPem
+func (client *Client) GetPrivateKeyCert() (_result *string) {
+	_result = client.PrivateKeyCert
+	return _result
 }
 
 func (client *Client) GetSignature(strToSign *string) (_result *string, _err error) {
-	credentials := client.CredentialsProvider.GetCredentials()
-	signer, _err := auth.GetSigner(credentials)
-	if _err != nil {
-		return
-	}
-	_result, _err = signer.SignString(tea.StringValue(strToSign), credentials.GetAccessKeySecret())
-	return
-}
 
-func (client *Client) parseClientKeyContent(content, password string, clientKey *ClientKey) (string, string, error) {
-	err := json.Unmarshal([]byte(content), clientKey)
-	if err != nil {
-		return "", "", err
+	signature, _err := dedicatedkmsopenapiutil.SignString(strToSign, client.PrivateKeySecret)
+	if _err != nil {
+		return signature, _err
 	}
-	privateKeyData, err := base64.StdEncoding.DecodeString(tea.StringValue(clientKey.PrivateKeyData))
-	if err != nil {
-		return "", "", err
-	}
-	blocks, err := pkcs12.ToPEM(privateKeyData, password)
-	if err != nil {
-		return "", "", err
-	}
-	return string(pem.EncodeToMemory(blocks[0])), string(pem.EncodeToMemory(blocks[1])), nil
+
+	_result = signature
+	return _result, _err
 }

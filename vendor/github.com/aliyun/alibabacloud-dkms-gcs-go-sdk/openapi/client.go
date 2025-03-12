@@ -1,36 +1,62 @@
 // This file is auto-generated, don't edit it. Thanks.
-package openapi
+package client
 
 import (
-	util "github.com/alibabacloud-go/tea-utils/service"
+	array "github.com/alibabacloud-go/darabonba-array/client"
+	map_ "github.com/alibabacloud-go/darabonba-map/client"
+	string_ "github.com/alibabacloud-go/darabonba-string/client"
+	openapiutil "github.com/alibabacloud-go/openapi-util/service"
+	util "github.com/alibabacloud-go/tea-utils/v2/service"
 	"github.com/alibabacloud-go/tea/tea"
 	dedicatedkmsopenapicredential "github.com/aliyun/alibabacloud-dkms-gcs-go-sdk/openapi-credential"
 	dedicatedkmsopenapiutil "github.com/aliyun/alibabacloud-dkms-gcs-go-sdk/openapi-util"
 )
 
 type Config struct {
+	// 访问凭证ID
 	AccessKeyId *string `json:"accessKeyId,omitempty" xml:"accessKeyId,omitempty"`
-	// pkcs1 or pkcs8 PEM format private key
+	// pkcs1 或 pkcs8 PEM 格式私钥
 	PrivateKey *string `json:"privateKey,omitempty" xml:"privateKey,omitempty"`
-	// crypto service address
-	Endpoint       *string                               `json:"endpoint,omitempty" xml:"endpoint,omitempty"`
-	Protocol       *string                               `json:"protocol,omitempty" xml:"protocol,omitempty"`
-	RegionId       *string                               `json:"regionId,omitempty" xml:"regionId,omitempty" pattern:"[a-zA-Z0-9-_]+"`
-	ReadTimeout    *int                                  `json:"readTimeout,omitempty" xml:"readTimeout,omitempty"`
-	ConnectTimeout *int                                  `json:"connectTimeout,omitempty" xml:"connectTimeout,omitempty"`
-	HttpProxy      *string                               `json:"httpProxy,omitempty" xml:"httpProxy,omitempty"`
-	HttpsProxy     *string                               `json:"httpsProxy,omitempty" xml:"httpsProxy,omitempty"`
-	Socks5Proxy    *string                               `json:"socks5Proxy,omitempty" xml:"socks5Proxy,omitempty"`
-	Socks5NetWork  *string                               `json:"socks5NetWork,omitempty" xml:"socks5NetWork,omitempty"`
-	NoProxy        *string                               `json:"noProxy,omitempty" xml:"noProxy,omitempty"`
-	MaxIdleConns   *int                                  `json:"maxIdleConns,omitempty" xml:"maxIdleConns,omitempty"`
-	UserAgent      *string                               `json:"userAgent,omitempty" xml:"userAgent,omitempty"`
-	Type           *string                               `json:"type,omitempty" xml:"type,omitempty"`
-	Credential     *dedicatedkmsopenapicredential.Client `json:"credential,omitempty" xml:"credential,omitempty"`
-	ClientKeyFile  *string                               `json:"clientKeyFile,omitempty" xml:"clientKeyFile,omitempty"`
-	// client key content
+	// 实例地址
+	Endpoint *string `json:"endpoint,omitempty" xml:"endpoint,omitempty"`
+	// 协议
+	Protocol *string `json:"protocol,omitempty" xml:"protocol,omitempty"`
+	// 区域标识
+	RegionId *string `json:"regionId,omitempty" xml:"regionId,omitempty" pattern:"[a-zA-Z0-9-_]+"`
+	// 读取超时时间
+	ReadTimeout *int `json:"readTimeout,omitempty" xml:"readTimeout,omitempty"`
+	// 连接超时时间
+	ConnectTimeout *int `json:"connectTimeout,omitempty" xml:"connectTimeout,omitempty"`
+	// http代理
+	HttpProxy *string `json:"httpProxy,omitempty" xml:"httpProxy,omitempty"`
+	// https代理
+	HttpsProxy *string `json:"httpsProxy,omitempty" xml:"httpsProxy,omitempty"`
+	// 无代理
+	NoProxy *string `json:"noProxy,omitempty" xml:"noProxy,omitempty"`
+	// 最大闲置连接数
+	MaxIdleConns *int `json:"maxIdleConns,omitempty" xml:"maxIdleConns,omitempty"`
+	// socks5代理
+	Socks5Proxy *string `json:"socks5Proxy,omitempty" xml:"socks5Proxy,omitempty"`
+	// socks5代理协议
+	Socks5NetWork *string `json:"socks5NetWork,omitempty" xml:"socks5NetWork,omitempty"`
+	// 访问凭证类型
+	Type *string `json:"type,omitempty" xml:"type,omitempty" require:"true"`
+	// 用户代理
+	UserAgent *string `json:"userAgent,omitempty" xml:"userAgent,omitempty"`
+	// 访问凭证
+	Credential *dedicatedkmsopenapicredential.Client `json:"credential,omitempty" xml:"credential,omitempty"`
+	// ClientKey文件路径
+	ClientKeyFile *string `json:"clientKeyFile,omitempty" xml:"clientKeyFile,omitempty"`
+	// ClientKey文件内容
 	ClientKeyContent *string `json:"clientKeyContent,omitempty" xml:"clientKeyContent,omitempty"`
-	Password         *string `json:"password,omitempty" xml:"password,omitempty"`
+	// ClientKey密码
+	Password *string `json:"password,omitempty" xml:"password,omitempty"`
+	// ca证书内容
+	Ca *string `json:"ca,omitempty" xml:"ca,omitempty"`
+	// ca证书文件路径
+	CaFilePath *string `json:"caFilePath,omitempty" xml:"caFilePath,omitempty"`
+	// 是否忽略SSL认证
+	IgnoreSSL *bool `json:"ignoreSSL,omitempty" xml:"ignoreSSL,omitempty"`
 }
 
 func (s Config) String() string {
@@ -86,16 +112,6 @@ func (s *Config) SetHttpsProxy(v string) *Config {
 	return s
 }
 
-func (s *Config) SetSocks5Proxy(v string) *Config {
-	s.Socks5Proxy = &v
-	return s
-}
-
-func (s *Config) SetSocks5NetWork(v string) *Config {
-	s.Socks5NetWork = &v
-	return s
-}
-
 func (s *Config) SetNoProxy(v string) *Config {
 	s.NoProxy = &v
 	return s
@@ -106,13 +122,23 @@ func (s *Config) SetMaxIdleConns(v int) *Config {
 	return s
 }
 
-func (s *Config) SetUserAgent(v string) *Config {
-	s.UserAgent = &v
+func (s *Config) SetSocks5Proxy(v string) *Config {
+	s.Socks5Proxy = &v
+	return s
+}
+
+func (s *Config) SetSocks5NetWork(v string) *Config {
+	s.Socks5NetWork = &v
 	return s
 }
 
 func (s *Config) SetType(v string) *Config {
 	s.Type = &v
+	return s
+}
+
+func (s *Config) SetUserAgent(v string) *Config {
+	s.UserAgent = &v
 	return s
 }
 
@@ -136,6 +162,21 @@ func (s *Config) SetPassword(v string) *Config {
 	return s
 }
 
+func (s *Config) SetCa(v string) *Config {
+	s.Ca = &v
+	return s
+}
+
+func (s *Config) SetCaFilePath(v string) *Config {
+	s.CaFilePath = &v
+	return s
+}
+
+func (s *Config) SetIgnoreSSL(v bool) *Config {
+	s.IgnoreSSL = &v
+	return s
+}
+
 type Client struct {
 	Endpoint       *string
 	RegionId       *string
@@ -150,6 +191,8 @@ type Client struct {
 	Socks5NetWork  *string
 	MaxIdleConns   *int
 	Credential     *dedicatedkmsopenapicredential.Client
+	Ca             *string
+	IgnoreSSL      *bool
 }
 
 func NewClient(config *Config) (*Client, error) {
@@ -159,7 +202,7 @@ func NewClient(config *Config) (*Client, error) {
 }
 
 func (client *Client) Init(config *Config) (_err error) {
-	if tea.BoolValue(util.IsUnset(tea.ToMap(config))) {
+	if tea.BoolValue(util.IsUnset(config)) {
 		_err = tea.NewSDKError(map[string]interface{}{
 			"name":    "ParameterMissing",
 			"message": "'config' can not be unset",
@@ -173,6 +216,11 @@ func (client *Client) Init(config *Config) (_err error) {
 			"message": "'config.endpoint' can not be empty",
 		})
 		return _err
+	} else {
+		if tea.BoolValue(string_.HasPrefix(config.Endpoint, tea.String("https://"))) {
+			config.Endpoint = string_.Replace(config.Endpoint, tea.String("https://"), tea.String(""), tea.Int(1))
+		}
+
 	}
 
 	if !tea.BoolValue(util.Empty(config.ClientKeyContent)) {
@@ -215,10 +263,23 @@ func (client *Client) Init(config *Config) (_err error) {
 		client.Credential = config.Credential
 	}
 
+	if !tea.BoolValue(util.IsUnset(config.Ca)) {
+		client.Ca = config.Ca
+	} else {
+		if !tea.BoolValue(util.IsUnset(config.CaFilePath)) {
+			client.Ca, _err = dedicatedkmsopenapiutil.GetCaCertFromFile(config.CaFilePath)
+			if _err != nil {
+				return _err
+			}
+
+		}
+
+	}
+
 	client.Endpoint = config.Endpoint
 	client.Protocol = config.Protocol
 	client.RegionId = config.RegionId
-	client.UserAgent = config.UserAgent
+	client.UserAgent = dedicatedkmsopenapiutil.GetUserAgent(config.UserAgent)
 	client.ReadTimeout = config.ReadTimeout
 	client.ConnectTimeout = config.ConnectTimeout
 	client.HttpProxy = config.HttpProxy
@@ -227,19 +288,14 @@ func (client *Client) Init(config *Config) (_err error) {
 	client.Socks5Proxy = config.Socks5Proxy
 	client.Socks5NetWork = config.Socks5NetWork
 	client.MaxIdleConns = config.MaxIdleConns
+	client.IgnoreSSL = config.IgnoreSSL
 	return nil
 }
 
-func (client *Client) DoRequest(apiName *string, apiVersion *string, protocol *string, method *string, signatureMethod *string, reqBodyBytes []byte, headers map[string]*string, runtime *dedicatedkmsopenapiutil.RuntimeOptions) (_result map[string]interface{}, _err error) {
+func (client *Client) DoRequest(apiName *string, apiVersion *string, protocol *string, method *string, signatureMethod *string, reqBodyBytes []byte, runtime *dedicatedkmsopenapiutil.RuntimeOptions, requestHeaders map[string]*string) (_result map[string]interface{}, _err error) {
 	_err = tea.Validate(runtime)
 	if _err != nil {
 		return _result, _err
-	}
-	var cert interface{}
-	var key interface{}
-	if runtime.Verify != nil && *runtime.Verify != "" {
-		cert = client.Credential.GetClientKeyCertPem()
-		key = tea.StringValue(client.Credential.GetAccessKeySecret())
 	}
 	_runtime := map[string]interface{}{
 		"timeouted":      "retry",
@@ -252,17 +308,17 @@ func (client *Client) DoRequest(apiName *string, apiVersion *string, protocol *s
 		"socks5NetWork":  tea.StringValue(util.DefaultString(runtime.Socks5NetWork, client.Socks5NetWork)),
 		"maxIdleConns":   tea.IntValue(util.DefaultNumber(runtime.MaxIdleConns, client.MaxIdleConns)),
 		"retry": map[string]interface{}{
-			"retryable":   tea.BoolValue(runtime.Autoretry),
+			"retryable":   tea.BoolValue(dedicatedkmsopenapiutil.DefaultBoolean(runtime.Autoretry, tea.Bool(true))),
 			"maxAttempts": tea.IntValue(util.DefaultNumber(runtime.MaxAttempts, tea.Int(3))),
 		},
 		"backoff": map[string]interface{}{
-			"policy": tea.StringValue(util.DefaultString(runtime.BackoffPolicy, tea.String("no"))),
+			"policy": tea.StringValue(util.DefaultString(runtime.BackoffPolicy, tea.String("yes"))),
 			"period": tea.IntValue(util.DefaultNumber(runtime.BackoffPeriod, tea.Int(1))),
 		},
-		"ignoreSSL": tea.BoolValue(runtime.IgnoreSSL),
-		"cert":      cert,
-		"key":       key,
-		"ca":        tea.StringValue(runtime.Verify),
+		"ignoreSSL": tea.BoolValue(dedicatedkmsopenapiutil.DefaultBoolean(client.IgnoreSSL, runtime.IgnoreSSL)),
+		"cert":      tea.StringValue(client.Credential.GetPrivateKeyCert()),
+		"key":       tea.StringValue(client.Credential.GetAccessKeySecret()),
+		"ca":        tea.StringValue(util.DefaultString(client.Ca, runtime.Verify)),
 	}
 
 	_resp := make(map[string]interface{})
@@ -279,26 +335,33 @@ func (client *Client) DoRequest(apiName *string, apiVersion *string, protocol *s
 			request_.Protocol = util.DefaultString(client.Protocol, protocol)
 			request_.Method = method
 			request_.Pathname = tea.String("/")
-			request_.Headers = tea.Merge(map[string]*string{
-				"accept":                tea.String("application/x-protobuf"),
-				"host":                  dedicatedkmsopenapiutil.GetHost(client.RegionId, client.Endpoint),
-				"date":                  util.GetDateUTCString(),
-				"user-agent":            util.GetUserAgent(client.UserAgent),
-				"x-kms-apiversion":      apiVersion,
-				"x-kms-apiname":         apiName,
-				"x-kms-signaturemethod": signatureMethod,
-				"x-kms-acccesskeyid":    client.Credential.GetAccessKeyId(),
-			}, headers)
+			request_.Headers = tea.Merge(requestHeaders)
+			request_.Headers["accept"] = tea.String("application/x-protobuf")
+			request_.Headers["host"] = client.Endpoint
+			request_.Headers["date"] = util.GetDateUTCString()
+			request_.Headers["user-agent"] = client.UserAgent
+			request_.Headers["x-kms-apiversion"] = apiVersion
+			request_.Headers["x-kms-apiname"] = apiName
+			request_.Headers["x-kms-signaturemethod"] = signatureMethod
+			request_.Headers["x-kms-acccesskeyid"] = client.Credential.GetAccessKeyId()
 			request_.Headers["content-type"] = tea.String("application/x-protobuf")
-			request_.Headers["content-length"] = dedicatedkmsopenapiutil.GetContentLength(reqBodyBytes)
-			request_.Headers["content-sha256"] = dedicatedkmsopenapiutil.GetContentSHA256(reqBodyBytes)
-			request_.Body = tea.ToReader(reqBodyBytes)
-			strToSign := dedicatedkmsopenapiutil.GetStringToSign(request_)
-			sign, _err := client.Credential.GetSignature(strToSign)
+			request_.Headers["content-length"], _err = dedicatedkmsopenapiutil.GetContentLength(reqBodyBytes)
 			if _err != nil {
 				return _result, _err
 			}
-			request_.Headers["authorization"] = sign
+
+			request_.Headers["content-sha256"] = string_.ToUpper(openapiutil.HexEncode(openapiutil.Hash(reqBodyBytes, tea.String("ACS3-RSA-SHA256"))))
+			request_.Body = tea.ToReader(reqBodyBytes)
+			strToSign, _err := dedicatedkmsopenapiutil.GetStringToSign(method, request_.Pathname, request_.Headers, request_.Query)
+			if _err != nil {
+				return _result, _err
+			}
+
+			request_.Headers["authorization"], _err = client.Credential.GetSignature(strToSign)
+			if _err != nil {
+				return _result, _err
+			}
+
 			response_, _err := tea.DoRequest(request_, _runtime)
 			if _err != nil {
 				return _result, _err
@@ -310,10 +373,16 @@ func (client *Client) DoRequest(apiName *string, apiVersion *string, protocol *s
 					return _result, _err
 				}
 
-				respMap, _err := dedicatedkmsopenapiutil.GetErrMessage(bodyBytes)
+				assertAsMapTmp, err := dedicatedkmsopenapiutil.GetErrMessage(bodyBytes)
+				if err != nil {
+					_err = err
+					return _result, _err
+				}
+				respMap, _err := util.AssertAsMap(assertAsMapTmp)
 				if _err != nil {
 					return _result, _err
 				}
+
 				_err = tea.NewSDKError(map[string]interface{}{
 					"code":    respMap["Code"],
 					"message": respMap["Message"],
@@ -331,13 +400,26 @@ func (client *Client) DoRequest(apiName *string, apiVersion *string, protocol *s
 				return _result, _err
 			}
 
-			_result = map[string]interface{}{
-				"headers": dedicatedkmsopenapiutil.FilterHeaders(response_.Headers, runtime.Headers),
-				"body":    bodyBytes,
+			responseHeaders := map[string]interface{}{}
+			headers := response_.Headers
+			if !tea.BoolValue(util.IsUnset(runtime.Headers)) {
+				for _, key := range map_.KeySet(headers) {
+					if tea.BoolValue(array.Contains(runtime.Headers, key)) {
+						responseHeaders[tea.StringValue(key)] = headers[tea.StringValue(key)]
+					}
+
+				}
 			}
+
+			_result = make(map[string]interface{})
+			_err = tea.Convert(map[string]interface{}{
+				"bodyBytes":       bodyBytes,
+				"responseHeaders": responseHeaders,
+			}, &_result)
 			return _result, _err
 		}()
-		if !tea.BoolValue(tea.Retryable(_err)) {
+		sdkError, _ := _err.(*tea.SDKError)
+		if !tea.BoolValue(tea.Retryable(_err)) && !tea.BoolValue(dedicatedkmsopenapiutil.IsRetryErr(sdkError)) {
 			break
 		}
 	}
