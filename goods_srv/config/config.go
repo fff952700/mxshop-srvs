@@ -2,32 +2,32 @@ package config
 
 // ServerCfg server
 type ServerCfg struct {
-	ServerInfo ServerConfig `mapstructure:"server" json:"server"`
-	MysqlInfo  MysqlConfig  `mapstructure:"mysql" json:"mysql"`
-	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
+	ServerInfo ServerConfig `mapstructure:"server" toml:"server"`
+	MysqlInfo  MysqlConfig  `mapstructure:"mysql" toml:"mysql"`
+	ConsulInfo ConsulConfig `mapstructure:"consul" toml:"consul"`
 }
 
 type ServerConfig struct {
-	Host string `mapstructure:"host" json:"host"`
-	Port int    `mapstructure:"port" json:"port"`
-	Name string `mapstructure:"name" json:"name"`
+	Host string `mapstructure:"host" toml:"host"`
+	Port int    `mapstructure:"port" toml:"port"`
+	Name string `mapstructure:"name" toml:"name"`
 }
 
 // MysqlConfig MysqlInfo
 type MysqlConfig struct {
-	Host     string `mapstructure:"host" json:"host"`
-	Port     int    `mapstructure:"port" json:"port"`
-	Dbname   string `mapstructure:"dbName" json:"dbname"`
-	Username string `mapstructure:"username" json:"username"`
-	Password string `mapstructure:"password" json:"password"`
+	Host     string `mapstructure:"host" toml:"host"`
+	Port     int    `mapstructure:"port" toml:"port"`
+	Dbname   string `mapstructure:"dbName" toml:"dbname"`
+	Username string `mapstructure:"username" toml:"username"`
+	Password string `mapstructure:"password" toml:"password"`
 }
 
 type ConsulConfig struct {
-	Host string   `mapstructure:"host" json:"host"`
-	Port int      `mapstructure:"port" json:"port"`
-	Name string   `mapstructure:"name" json:"name"`
-	Id   string   `mapstructure:"id" json:"id"`
-	Tag  []string `mapstructure:"tag" json:"tag"`
+	Host string   `mapstructure:"host" toml:"host"`
+	Port int      `mapstructure:"port" toml:"port"`
+	Name string   `mapstructure:"name" toml:"name"`
+	Id   string   `mapstructure:"id" toml:"id"`
+	Tag  []string `mapstructure:"tag" toml:"tag"`
 }
 
 type NacosConfig struct {

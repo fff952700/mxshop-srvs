@@ -1,12 +1,12 @@
 package initialize
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	"github.com/pelletier/go-toml/v2"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
@@ -66,6 +66,7 @@ func init() {
 		DataId: global.NacosConf.DataId,
 		Group:  global.NacosConf.Group,
 	})
+	fmt.Println(content)
 	if err != nil {
 		zap.S().Panicw("get config failed", "err", err)
 	}
@@ -83,9 +84,13 @@ func init() {
 	// 将json序列化为struct
 	// 实例化配置对象
 	serverConfig := global.ServerConf
-	if err = json.Unmarshal([]byte(content), &serverConfig); err != nil {
+	// 通过toml配置赋值给serverConfig
+	if err = toml.Unmarshal([]byte(content), &serverConfig); err != nil {
 		zap.S().Panicw("unmarshal config failed", "err", err)
 	}
+	//if err = json.Unmarshal([]byte(content), &serverConfig); err != nil {
+	//	zap.S().Panicw("unmarshal config failed", "err", err)
+	//}
 }
 
 // 获取环境变量
