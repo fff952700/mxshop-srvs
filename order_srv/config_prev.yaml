@@ -1,0 +1,6 @@
+host: "192.168.2.150"
+port: 8848
+scheme: "http"
+namespace: "5dd8ea5d-850c-447c-8653-de0dda05d906"
+dataId: "order_srv"
+group: "dev"

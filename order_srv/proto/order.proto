@@ -1,0 +1,83 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = "./;proto";
+
+service Order {
+  // 购物车
+  rpc CartItemList(UserInfo) returns (CartItemListResponse);
+  rpc CartItemCreate(CartItemRequest) returns (CartItemResponse);
+  rpc CartItemUpdate(CartItemRequest) returns (google.protobuf.Empty);
+  rpc CartItemDelete(CartItemRequest) returns (google.protobuf.Empty);
+
+  // 订单
+  rpc OrderCreate(OrderRequest) returns (OrderResponse);
+  rpc OrderList(OrderFilterRequest) returns (OrderListResponse);
+  rpc OrderDetail(OrderRequest) returns (OrderResponse);
+  rpc OrderStatusUpdate(OrderStatusRequest) returns (google.protobuf.Empty);
+}
+message UserInfo {
+  int32 id = 1;
+}
+message CartItemRequest {
+  int32 id = 1;
+  int32 userId = 2;
+  int32 goodsId = 3;
+  int32 nums = 4;
+  int32 checked = 5;
+  string goodsName = 6;
+  string goodsImage = 7;
+  int32 goodsPrice = 8;
+}
+message CartItemResponse {
+  int32 id = 1;
+  int32 userId = 2;
+  int32 goodsId = 3;
+  int32 nums = 4;
+  int32 checked = 5;
+}
+message CartItemListResponse {
+  int32 total = 1;
+  repeated CartItemResponse data = 2;
+}
+
+// 订单相关
+message OrderRequest{
+  int32 id = 1;
+  int32 userId = 2;
+  string address = 3;
+  string name = 4;
+  string mobile = 5;
+  string post = 6;
+}
+
+message OrderResponse {
+  int32 id = 1;
+  int32 userId = 2;
+  string orderSn = 3;
+  string payType = 4;
+  int32 status = 5;
+  string post = 6;
+  string address = 7;
+  string name = 8;
+  string mobile = 9;
+  string message = 10;
+  int32 price = 11;
+  string addTime = 12;
+}
+
+message OrderFilterRequest{
+  int32 userId = 1;
+  int32 page = 2;
+  int32 pagePerNums = 3;
+}
+
+message OrderListResponse {
+  int32 total = 1;
+  repeated OrderResponse data = 2;
+}
+
+message OrderStatusRequest{
+  int32 id = 1;
+  int32 orderSn = 2;
+  int32 status = 3;
+}
