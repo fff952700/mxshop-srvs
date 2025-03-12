@@ -2,11 +2,13 @@ package consul
 
 import (
 	"fmt"
-	"github.com/hashicorp/consul/api"
-	"go.uber.org/zap"
-	"mxshop_srvs/goods_srv/global"
 	"strconv"
 	"time"
+
+	"github.com/hashicorp/consul/api"
+	"go.uber.org/zap"
+
+	"mxshop_srvs/goods_srv/global"
 )
 
 type Register struct {
