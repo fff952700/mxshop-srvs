@@ -66,7 +66,6 @@ func init() {
 		DataId: global.NacosConf.DataId,
 		Group:  global.NacosConf.Group,
 	})
-	fmt.Println(content)
 	if err != nil {
 		zap.S().Panicw("get config failed", "err", err)
 	}
