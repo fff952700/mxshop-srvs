@@ -16,25 +16,27 @@ service Order {
   rpc OrderStatusUpdate(OrderStatusRequest) returns (google.protobuf.Empty);
 }
 message UserInfo {
-  int32 id = 1;
+  int32 userId = 1;
 }
 message CartItemRequest {
   int32 id = 1;
   int32 userId = 2;
   int32 goodsId = 3;
   int32 nums = 4;
-  int32 checked = 5;
+  bool checked = 5;
   string goodsName = 6;
   string goodsImage = 7;
   int32 goodsPrice = 8;
 }
+
 message CartItemResponse {
   int32 id = 1;
   int32 userId = 2;
   int32 goodsId = 3;
   int32 nums = 4;
-  int32 checked = 5;
+  bool checked = 5;
 }
+
 message CartItemListResponse {
   int32 total = 1;
   repeated CartItemResponse data = 2;
@@ -55,7 +57,7 @@ message OrderResponse {
   int32 userId = 2;
   string orderSn = 3;
   string payType = 4;
-  int32 status = 5;
+  string status = 5;
   string post = 6;
   string address = 7;
   string name = 8;
