@@ -9,7 +9,7 @@ import (
 var UserClient proto.UserClient
 
 func init() {
-	conn, err := grpc.NewClient("192.168.2.150:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("192.168.2.150:8090", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}

@@ -1,0 +1,4 @@
+# 强制所有 Go 文件使用 LF 换行符
+*.go text eol=lf
+# 不对 vendor 目录中的文件进行行结尾转换
+vendor/** -text

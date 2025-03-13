@@ -39,7 +39,7 @@ func init() {
 	loggers, _ := zap.NewDevelopment()
 	zap.ReplaceGlobals(loggers)
 
-	conn, err := grpc.NewClient("192.168.2.150:8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("192.168.2.150:8092", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		zap.S().Panicw("err conn to server")
 	}
