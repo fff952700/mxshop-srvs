@@ -8,7 +8,7 @@ import (
 )
 
 func TestCartCreate(t *testing.T) {
-	resp, err := Client.CartItemCreate(context.Background(), &proto.CartItemRequest{
+	resp, err := Client.CreateCartItem(context.Background(), &proto.CartItemRequest{
 		UserId:  1,
 		GoodsId: 2,
 		Nums:    1,
@@ -33,4 +33,25 @@ func TestCartItemList(t *testing.T) {
 		t.Fatalf("CartItemList err: %v", err)
 	}
 	t.Logf("CartItemList resp: %v", string(data))
+}
+
+func TestCartItemUpdate(t *testing.T) {
+	resp, err := Client.UpdateCartItem(context.Background(), &proto.CartItemRequest{
+		Id:      3,
+		Checked: false,
+	})
+	if err != nil {
+		t.Fatalf("CartItemUpdate err: %v", err)
+	}
+	t.Logf("CartItemUpdate resp: %v", resp)
+}
+
+func TestDeleteCartItem(t *testing.T) {
+	resp, err := Client.DeleteCartItem(context.Background(), &proto.CartItemRequest{
+		Id: 3,
+	})
+	if err != nil {
+		t.Fatalf("CartItemDelete err: %v", err)
+	}
+	t.Logf("CartItemDelete resp: %v", resp)
 }

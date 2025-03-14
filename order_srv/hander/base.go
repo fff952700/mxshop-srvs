@@ -11,9 +11,9 @@ func (o *OrderServer) Model2InfoResponse(itemInterface interface{}) interface{} 
 	switch itemInfo := itemInterface.(type) {
 	// 购物车
 	case []*model.ShoppingCart:
-		var cartItemList []*proto.CartItemResponse
+		var cartItemList []*proto.ShopCartInfoResponse
 		for _, item := range itemInfo {
-			cartItemList = append(cartItemList, &proto.CartItemResponse{
+			cartItemList = append(cartItemList, &proto.ShopCartInfoResponse{
 				Id:      item.Id,
 				UserId:  item.UserId,
 				GoodsId: item.GoodsId,
@@ -24,9 +24,9 @@ func (o *OrderServer) Model2InfoResponse(itemInterface interface{}) interface{} 
 		return cartItemList
 	// 订单
 	case []*model.OrderInfo:
-		var orderList []*proto.OrderResponse
+		var orderList []*proto.OrderInfoResponse
 		for _, item := range itemInfo {
-			orderList = append(orderList, &proto.OrderResponse{
+			orderList = append(orderList, &proto.OrderInfoResponse{
 				Id:      item.Id,
 				UserId:  item.UserId,
 				OrderSn: item.OrderSn,
@@ -37,6 +37,17 @@ func (o *OrderServer) Model2InfoResponse(itemInterface interface{}) interface{} 
 				Name:    item.SignerName,
 				Mobile:  item.SingerMobile,
 				PayTime: fmt.Sprintf("%T", item.PayTime),
+			})
+		}
+		return orderList
+	case []*model.OrderGoods:
+		var orderList []*proto.OrderItemResponse
+		for _, item := range itemInfo {
+			orderList = append(orderList, &proto.OrderItemResponse{
+				GoodsId:    item.GoodsId,
+				GoodsName:  item.GoodsName,
+				GoodsImage: item.GoodsImage,
+				Nums:       item.Nums,
 			})
 		}
 		return orderList
