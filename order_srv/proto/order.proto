@@ -64,7 +64,7 @@ message OrderResponse {
   string mobile = 9;
   string message = 10;
   int32 price = 11;
-  string addTime = 12;
+  string payTime = 12;
 }
 
 message OrderFilterRequest{
