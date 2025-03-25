@@ -55,3 +55,17 @@ func TestDeleteCartItem(t *testing.T) {
 	}
 	t.Logf("CartItemDelete resp: %v", resp)
 }
+
+func TestCreateOrder(t *testing.T) {
+	resp, err := Client.CreateOrder(context.Background(), &proto.OrderRequest{
+		UserId:  1,
+		Address: "北京市海淀区",
+		Name:    "张三",
+		Mobile:  "13888888888",
+		Post:    "test",
+	})
+	if err != nil {
+		t.Fatalf("CreateOrder err: %v", err)
+	}
+	t.Logf("CreateOrder resp: %v", resp)
+}

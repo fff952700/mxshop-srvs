@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -23,6 +24,7 @@ func (g *GoodsServer) Model2InfoResponse(goodsList interface{}) interface{} {
 		return goodsInfoResponse
 	case *model.Goods:
 		// 处理单个商品
+		zap.S().Info("------------")
 		return g.toGoodsInfoResponse(goods)
 	default:
 		return nil
@@ -101,10 +103,12 @@ func (g *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 // // 现在用户提交订单有多个商品，你得批量查询商品的信息吧
 func (g *GoodsServer) BatchGetGoods(ctx context.Context, req *proto.BatchGoodsIdInfo) (*proto.GoodsListResponse, error) {
 	var (
-		goodsList         []model.Goods
+		goodsList         []*model.Goods
 		goodsListResponse = &proto.GoodsListResponse{}
 	)
-	global.DB.Find(&goodsList, req.Id)
+	if result := global.DB.Find(&goodsList, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "goods not found")
+	}
 	goodsListResponse.Total = int32(len(goodsList))
 	goodsInfoResponses := g.Model2InfoResponse(goodsList)
 	goodsListResponse.Data = goodsInfoResponses.([]*proto.GoodsInfoResponse)

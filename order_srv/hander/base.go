@@ -40,6 +40,23 @@ func (o *OrderServer) Model2InfoResponse(itemInterface interface{}) interface{} 
 			})
 		}
 		return orderList
+	case *model.OrderInfo:
+		payTime := ""
+		if itemInfo.PayTime != nil {
+			payTime = itemInfo.PayTime.Format("2006-01-02 15:04:05")
+		}
+		return &proto.OrderInfoResponse{
+			Id:      itemInfo.Id,
+			UserId:  itemInfo.UserId,
+			OrderSn: itemInfo.OrderSn,
+			PayType: itemInfo.PayType,
+			Status:  itemInfo.Status,
+			Post:    itemInfo.Post,
+			Address: itemInfo.Address,
+			Name:    itemInfo.SignerName,
+			Mobile:  itemInfo.SingerMobile,
+			PayTime: payTime,
+		}
 	case []*model.OrderGoods:
 		var orderList []*proto.OrderItemResponse
 		for _, item := range itemInfo {

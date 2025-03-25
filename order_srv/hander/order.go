@@ -2,8 +2,7 @@ package hander
 
 import (
 	"context"
-	"fmt"
-	"math/rand"
+	"go.uber.org/zap"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -139,21 +138,24 @@ func (o *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 	*/
 	// 查询购物车信息
 	var (
-		goodsIds      []int32
-		total         float32
-		sellInfo      = &proto.SellInfo{}
-		goodsNumMap   = make(map[int32]int32)
-		orderInfoResp = &proto.OrderInfoResponse{}
-		shopCartList  []*model.ShoppingCart
-		orderGoods    []*model.OrderGoods
-		orderSn       = o.GenerateOrderSn()
+		goodsIds     []int32
+		total        float32
+		sellInfo     = &proto.SellInfo{}
+		goodsNumMap  = make(map[int32]int32)
+		orderInfo    = &model.OrderInfo{}
+		shopCartList []*model.ShoppingCart
+		shopCartIds  []int32
+		orderGoods   []*model.OrderGoods
+		orderSn      = o.GenerateOrderSn()
 	)
+	tx := global.DB.Begin()
 
-	if result := global.DB.Where(&model.ShoppingCart{UserId: req.UserId, Checked: true}).Find(&shopCartList); result.RowsAffected == 0 {
+	if result := global.DB.Where("user_id = ? and checked = ? and is_del = ?", req.UserId, true, false).Find(&shopCartList); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "购物车记录不存在")
 	}
 
 	for _, shop := range shopCartList {
+		shopCartIds = append(shopCartIds, shop.Id)
 		goodsIds = append(goodsIds, shop.GoodsId)
 		goodsNumMap[shop.GoodsId] = shop.Nums
 		sellInfo.GoodsInfo = append(sellInfo.GoodsInfo, &proto.GoodsInvInfo{
@@ -185,25 +187,34 @@ func (o *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 	}
 
 	// 生成订单
-	orderInfoResp.UserId = req.UserId
+	orderInfo.UserId = req.UserId
 	// 订单号使用时间戳纳秒级
-	orderInfoResp.OrderSn = orderSn
-	orderInfoResp.PayType = "not check"
-	orderInfoResp.Post = req.Post
-	orderInfoResp.Total = total
-	orderInfoResp.Address = req.Address
-	orderInfoResp.Name = req.Name
-	orderInfoResp.Mobile = req.Mobile
+	orderInfo.OrderSn = orderSn
+	orderInfo.PayType = "not check"
+	orderInfo.OrderMount = total
+	orderInfo.Address = req.Address
+	orderInfo.SignerName = req.Name
+	orderInfo.SingerMobile = req.Mobile
+	orderInfo.Post = req.Post
 
-	global.DB.Create(&orderInfoResp)
-
+	if result := tx.Create(&orderInfo); result.RowsAffected == 0 {
+		tx.Rollback()
+	}
+	// 订单详情
+	if result := tx.Create(&orderGoods); result.Error != nil {
+		tx.Rollback()
+	}
 	// 删除购物车记录
-	global.DB.Where("user_id =? and checked =?", req.UserId, true).Delete(&model.ShoppingCart{})
-	return orderInfoResp, nil
+	if result := tx.Where(" id in ?", shopCartIds).Updates(&model.ShoppingCart{BaseModel: model.BaseModel{IsDel: true}}); result.RowsAffected == 0 {
+		tx.Rollback()
+	}
+	tx.Commit()
+	data := o.Model2InfoResponse(orderInfo)
+	zap.S().Infof("data %v\n", data)
+	return data.(*proto.OrderInfoResponse), nil
 }
 
-// 雪花算法 + 随机数生成订单号
-func (o *OrderServer) GenerateOrderSn() string {
-	return fmt.Sprintf("%d%d", time.Now().Unix(), rand.Intn(10000))
+func (o *OrderServer) GenerateOrderSn() int64 {
+	return time.Now().UnixNano()
 
 }

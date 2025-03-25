@@ -24,11 +24,15 @@ type MysqlConfig struct {
 }
 
 type ConsulConfig struct {
-	Host string   `mapstructure:"host" toml:"host"`
-	Port int      `mapstructure:"port" toml:"port"`
-	Name string   `mapstructure:"name" toml:"name"`
-	Id   string   `mapstructure:"id" toml:"id"`
-	Tag  []string `mapstructure:"tag" toml:"tag"`
+	Host          string   `mapstructure:"host" toml:"host"`
+	Port          int      `mapstructure:"port" toml:"port"`
+	Name          string   `mapstructure:"name" toml:"name"`
+	Id            string   `mapstructure:"id" toml:"id"`
+	Tag           []string `mapstructure:"tag" toml:"tag"`
+	GoodsName     string   `mapstructure:"goods_name" toml:"goods_name"`
+	GoodsTag      string   `mapstructure:"goods_tag" toml:"goods_tag"`
+	InventoryName string   `mapstructure:"inventory_name" toml:"inventory_name"`
+	InventoryTag  string   `mapstructure:"inventory_tag" toml:"inventory_tag"`
 }
 
 type NacosConfig struct {
