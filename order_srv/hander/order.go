@@ -2,7 +2,10 @@ package hander
 
 import (
 	"context"
+	"fmt"
 	"go.uber.org/zap"
+	"math/rand"
+	"strconv"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -146,8 +149,12 @@ func (o *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 		shopCartList []*model.ShoppingCart
 		shopCartIds  []int32
 		orderGoods   []*model.OrderGoods
-		orderSn      = o.GenerateOrderSn()
 	)
+	orderSnStr := o.GenerateOrderSn(req.UserId)
+	orderSn, err := strconv.ParseInt(orderSnStr, 10, 64)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 	tx := global.DB.Begin()
 
 	if result := global.DB.Where("user_id = ? and checked = ? and is_del = ?", req.UserId, true, false).Find(&shopCartList); result.RowsAffected == 0 {
@@ -200,8 +207,8 @@ func (o *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 	if result := tx.Create(&orderInfo); result.RowsAffected == 0 {
 		tx.Rollback()
 	}
-	// 订单详情
-	if result := tx.Create(&orderGoods); result.Error != nil {
+	// 订单详情 批量插入
+	if result := tx.CreateInBatches(&orderGoods, 100); result.Error != nil {
 		tx.Rollback()
 	}
 	// 删除购物车记录
@@ -214,7 +221,20 @@ func (o *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 	return data.(*proto.OrderInfoResponse), nil
 }
 
-func (o *OrderServer) GenerateOrderSn() int64 {
-	return time.Now().UnixNano()
+func (o *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderStatus) (*emptypb.Empty, error) {
+	// 订单状态更新
+	var (
+		orderInfo = &model.OrderInfo{}
+	)
+	if result := global.DB.Where("order_sn = ?", req.OrderSn).Find(orderInfo); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "订单不存在")
+	}
+	// 需要支付接口返回信息例如渠道 状态等
 
+	return &emptypb.Empty{}, nil
+}
+
+func (o *OrderServer) GenerateOrderSn(userId int32) string {
+	// 纳秒 + 用户id + 随机数
+	return fmt.Sprintf("%d%d%d", time.Now().UnixNano(), userId, rand.Int31n(90)+10)
 }

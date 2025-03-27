@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
+	_ "github.com/mbobakov/grpc-consul-resolver" // 不引入报错
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -30,8 +30,6 @@ func init() {
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
 		)
-		fmt.Printf("consul://%s:%d/%s?wait=%s&tag=%s\n", cfg.Host, cfg.Port,
-			c.name, "14s", c.Tag)
 		if err != nil {
 			zap.S().Panicw("Init Client Conn Err", "error", err.Error())
 			return

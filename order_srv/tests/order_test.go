@@ -2,9 +2,11 @@ package tests
 
 import (
 	"context"
-	"google.golang.org/protobuf/encoding/protojson"
-	"mxshop_srvs/order_srv/proto"
 	"testing"
+
+	"google.golang.org/protobuf/encoding/protojson"
+
+	"mxshop_srvs/order_srv/proto"
 )
 
 func TestCartCreate(t *testing.T) {
