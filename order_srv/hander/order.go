@@ -77,7 +77,7 @@ func (o *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReq
 	if len(updateMap) == 0 {
 		return &emptypb.Empty{}, nil
 	}
-	global.DB.Model(&model.ShoppingCart{}).Where("id =?", req.Id).Updates(updateMap)
+	global.DB.Model(&model.ShoppingCart{}).Where("id =? and user_id = ?", req.Id, req.UserId).Updates(updateMap)
 	return &emptypb.Empty{}, nil
 }
 
