@@ -120,7 +120,7 @@ func (o *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) 
 		orderGoods []*model.OrderGoods
 		orderResp  = &proto.OrderInfoDetailResponse{}
 	)
-	if result := global.DB.First(orderInfo, req.Id, req.UserId); result.RowsAffected == 0 {
+	if result := global.DB.Where("id = ?", req.Id).First(orderInfo); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "订单不存在")
 	}
 	orderResp.OrderInfo = o.Model2InfoResponse(orderInfo).(*proto.OrderInfoResponse)

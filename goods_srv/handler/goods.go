@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -24,7 +23,6 @@ func (g *GoodsServer) Model2InfoResponse(goodsList interface{}) interface{} {
 		return goodsInfoResponse
 	case *model.Goods:
 		// 处理单个商品
-		zap.S().Info("------------")
 		return g.toGoodsInfoResponse(goods)
 	default:
 		return nil
