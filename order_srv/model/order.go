@@ -13,7 +13,7 @@ type ShoppingCart struct {
 type OrderInfo struct {
 	BaseModel
 	UserId       int32      `gorm:"type:int;index:idx_userId;not null;comment:'用户id'"`
-	OrderSn      int64      `gorm:"type:int;not null;uniqueIndex:uniq_orderSn;comment:'订单号'"`
+	OrderSn      string     `gorm:"type:varchar(26);not null;uniqueIndex:uniq_orderSn;comment:'订单号'"`
 	PayType      string     `gorm:"type:varchar(20);not null;default:alipay;comment:'支付类型，alipay:支付宝，wechat:微信'"`
 	Status       string     `gorm:"type:varchar(20);default:PAYING;comment:'PAYING(待支付), TRADE_SUCCESS(成功)， TRADE_CLOSED(超时关闭), WAIT_BUYER_PAY(交易创建), TRADE_FINISHED(交易结束)'"`
 	TradeNo      string     `gorm:"type:varchar(100);comment:'交易号'"`
@@ -27,8 +27,8 @@ type OrderInfo struct {
 
 type OrderGoods struct {
 	BaseModel
-	OrderSn int64 `gorm:"type:int;uniqueIndex:uniq_orderSn;not null;comment:'订单号'"`
-	GoodsId int32 `gorm:"type:int;index:idx_GoodsId;not null;comment:'商品id'"`
+	OrderSn string `gorm:"type:varchar(26);uniqueIndex:uniq_orderSn;not null;comment:'订单号'"`
+	GoodsId int32  `gorm:"type:int;index:idx_GoodsId;not null;comment:'商品id'"`
 	// 商品信息
 	GoodsName  string  `gorm:"type:varchar(100);not null;comment:'商品名称'"`
 	GoodsImage string  `gorm:"type:varchar(200);not null;comment:'商品图片'"`

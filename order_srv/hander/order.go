@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"math/rand"
-	"strconv"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -104,8 +103,15 @@ func (o *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterReque
 		orderList []*model.OrderInfo
 		total     int64
 	)
-	global.DB.Where(&model.OrderInfo{UserId: req.UserId}).Count(&total)
-	global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Where(&model.OrderInfo{UserId: req.UserId}).Find(&orderList)
+	if req.UserId == 0 {
+		// 表示管理员查询
+		global.DB.Model(&model.OrderInfo{}).Count(&total)
+		global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Model(&model.OrderInfo{}).Find(&orderList)
+	} else {
+		global.DB.Where(&model.OrderInfo{UserId: req.UserId}).Count(&total)
+		global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Where(&model.OrderInfo{UserId: req.UserId}).Find(&orderList)
+	}
+
 	data := o.Model2InfoResponse(orderList)
 	return &proto.OrderListResponse{
 		Total: int32(total),
@@ -150,11 +156,8 @@ func (o *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 		shopCartIds  []int32
 		orderGoods   []*model.OrderGoods
 	)
-	orderSnStr := o.GenerateOrderSn(req.UserId)
-	orderSn, err := strconv.ParseInt(orderSnStr, 10, 64)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	orderSn := o.GenerateOrderSn()
+	zap.S().Infof("orderSn:%v", orderSn)
 	tx := global.DB.Begin()
 
 	if result := global.DB.Where("user_id = ? and checked = ? and is_del = ?", req.UserId, true, false).Find(&shopCartList); result.RowsAffected == 0 {
@@ -234,7 +237,18 @@ func (o *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderSta
 	return &emptypb.Empty{}, nil
 }
 
-func (o *OrderServer) GenerateOrderSn(userId int32) string {
-	// 纳秒 + 用户id + 随机数
-	return fmt.Sprintf("%d%d%d", time.Now().UnixNano(), userId, rand.Int31n(90)+10)
+func (o *OrderServer) GenerateOrderSn() string {
+	// 纳秒 + 随机字符串
+	randStr := GenerateRandomString(6)
+	return fmt.Sprintf("%s-%d", randStr, time.Now().UnixNano())
+}
+
+func GenerateRandomString(length int) string {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
 }

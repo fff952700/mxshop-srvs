@@ -1,7 +1,6 @@
 package hander
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 	"mxshop_srvs/order_srv/model"
 	"mxshop_srvs/order_srv/proto"
@@ -26,6 +25,10 @@ func (o *OrderServer) Model2InfoResponse(itemInterface interface{}) interface{} 
 	case []*model.OrderInfo:
 		var orderList []*proto.OrderInfoResponse
 		for _, item := range itemInfo {
+			payTime := ""
+			if item.PayTime != nil {
+				payTime = item.PayTime.Format("2006-01-02 15:04:05")
+			}
 			orderList = append(orderList, &proto.OrderInfoResponse{
 				Id:      item.Id,
 				UserId:  item.UserId,
@@ -36,7 +39,7 @@ func (o *OrderServer) Model2InfoResponse(itemInterface interface{}) interface{} 
 				Address: item.Address,
 				Name:    item.SignerName,
 				Mobile:  item.SingerMobile,
-				PayTime: fmt.Sprintf("%T", item.PayTime),
+				PayTime: payTime,
 			})
 		}
 		return orderList
